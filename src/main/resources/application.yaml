@@ -1,3 +1,12 @@
 spring:
   flyway:
     locations: db/migrations
+  datasource:
+    url: jdbc:postgresql://localhost:5432/electronic_shop_tvo
+    username: root
+    password: pokus
+
+server:
+  port: 1409
+  servlet:
+    context-path: "/shop"
