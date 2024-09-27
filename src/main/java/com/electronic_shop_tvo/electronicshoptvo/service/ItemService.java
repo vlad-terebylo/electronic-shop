@@ -21,7 +21,7 @@ public class ItemService {
         return this.itemRepository.getAllItems();
     }
 
-    public Item getItemById(long id) {
+    public Item getItemById(int id) {
         return this.itemRepository.getItemById(id);
     }
 
@@ -29,15 +29,15 @@ public class ItemService {
         return this.itemRepository.getItemsByTitle(title);
     }
 
-    public void addNewItem() {
-        this.itemRepository.addNewItem();
+    public void addNewItem(Item item) {
+        this.itemRepository.addNewItem(item);
     }
 
-    public void updateItem(long id,Item item) {
+    public void updateItem(int id,Item item) {
         this.itemRepository.updateItem(id, item);
     }
 
-    public void deleteItem(long id) {
+    public void deleteItem(int id) {
         this.itemRepository.deleteItem(id);
     }
 }

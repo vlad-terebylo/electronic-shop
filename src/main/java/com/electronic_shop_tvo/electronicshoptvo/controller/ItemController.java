@@ -3,50 +3,44 @@ package com.electronic_shop_tvo.electronicshoptvo.controller;
 import com.electronic_shop_tvo.electronicshoptvo.model.Item;
 import com.electronic_shop_tvo.electronicshoptvo.service.ItemService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/tvo")
+@RequestMapping("/items")
 public class ItemController {
 
-    private ItemService itemService;
-
-    @Autowired
-    public ItemController(ItemService service) {
-        this.itemService = service;
-    }
+    private final ItemService itemService;
 
     @GetMapping
     public List<Item> getAllItems() {
         return this.itemService.getAllItems();
     }
 
-    @GetMapping("{/id}")
-    public Item getItemById(@PathVariable long id) {
+    @GetMapping("/{id}")
+    public Item getItemById(@PathVariable int id) {
         return this.itemService.getItemById(id);
     }
 
-    @GetMapping("/{title}")
+    @GetMapping("getByTitle/{title}")
     public List<Item> getItemsByTitle(@PathVariable String title) {
         return this.itemService.getItemsByTitle(title);
     }
 
     @PostMapping
-    public void addNewItem() {
-        this.itemService.addNewItem();
+    public void addNewItem(@RequestBody Item item) {
+        this.itemService.addNewItem(item);
     }
 
     @PutMapping("/{id}")
-    public void updateItem(@PathVariable long id, @RequestBody Item item) {
+    public void updateItem(@PathVariable int id, @RequestBody Item item) {
         this.itemService.updateItem(id, item);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteItem(@PathVariable long id) {
+    public void deleteItem(@PathVariable int id) {
         this.itemService.deleteItem(id);
     }
 

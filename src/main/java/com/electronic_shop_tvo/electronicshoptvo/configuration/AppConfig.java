@@ -6,18 +6,19 @@ import com.electronic_shop_tvo.electronicshoptvo.repository.jdbc.JdbcItemDatabas
 import com.electronic_shop_tvo.electronicshoptvo.repository.jdbc.JdbcUserDatabaseRealization;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
 @Configuration
 public class AppConfig {
 
     @Bean
-    public ItemRepository getItemRepository() {
-        return new JdbcItemDatabaseRealization();
+    public ItemRepository getItemRepository(NamedParameterJdbcOperations jdbcTemplate) {
+        return new JdbcItemDatabaseRealization(jdbcTemplate);
     }
 
     @Bean
-    public UserRepository getUserRepository() {
-        return new JdbcUserDatabaseRealization();
+    public UserRepository getUserRepository(NamedParameterJdbcOperations jdbcTemplate) {
+        return new JdbcUserDatabaseRealization(jdbcTemplate);
     }
 
 }

@@ -8,13 +8,13 @@ import java.util.List;
 public interface ItemRepository {
     List<Item> getAllItems();
 
-    Item getItemById(long id);
+    Item getItemById(int id);
 
     List<Item> getItemsByTitle(String title);
 
-    void addNewItem();
+    void addNewItem(Item item);
 
-    void updateItem(long id, Item item);
+    void updateItem(int id, Item item);
 
-    void deleteItem(long id);
+    void deleteItem(int id);
 }
