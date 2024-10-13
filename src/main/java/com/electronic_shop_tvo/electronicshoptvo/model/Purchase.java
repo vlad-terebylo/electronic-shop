@@ -11,8 +11,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Purchase {
-    private long id;
+    private int id;
     private String email;
     private String cardNumber;
-    private List<Item> items;
+    private int itemId;
 }

@@ -1,8 +1,10 @@
 package com.electronic_shop_tvo.electronicshoptvo.configuration;
 
 import com.electronic_shop_tvo.electronicshoptvo.repository.ItemRepository;
+import com.electronic_shop_tvo.electronicshoptvo.repository.PurchaseRepository;
 import com.electronic_shop_tvo.electronicshoptvo.repository.UserRepository;
 import com.electronic_shop_tvo.electronicshoptvo.repository.jdbc.JdbcItemDatabaseRealization;
+import com.electronic_shop_tvo.electronicshoptvo.repository.jdbc.JdbcPurchaseDatabaseRealization;
 import com.electronic_shop_tvo.electronicshoptvo.repository.jdbc.JdbcUserDatabaseRealization;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,5 +22,11 @@ public class AppConfig {
     public UserRepository getUserRepository(NamedParameterJdbcOperations jdbcTemplate) {
         return new JdbcUserDatabaseRealization(jdbcTemplate);
     }
+
+    @Bean
+    public PurchaseRepository getPurchaseRepository(NamedParameterJdbcOperations jdbcTemplate){
+        return new JdbcPurchaseDatabaseRealization(jdbcTemplate);
+    }
+
 
 }

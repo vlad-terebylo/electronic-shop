@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.Objects;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -15,7 +15,7 @@ public class Item {
     private int id;
     private String title;
     private BigDecimal price;
-    private String producingYear;
+    private LocalDateTime producingYear;
     private String manufacturer;
     private int quantity;
     private ItemType itemType;
