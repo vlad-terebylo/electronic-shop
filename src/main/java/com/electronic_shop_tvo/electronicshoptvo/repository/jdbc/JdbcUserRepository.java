@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class JdbcUserDatabaseRealization implements UserRepository {
+public class JdbcUserRepository implements UserRepository {
 
     private static final BeanPropertyRowMapper<User> ROW_MAPPER = new BeanPropertyRowMapper<>(User.class);
     private final NamedParameterJdbcOperations jdbcTemplate;

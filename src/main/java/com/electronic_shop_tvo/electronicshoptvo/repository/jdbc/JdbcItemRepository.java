@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class JdbcItemDatabaseRealization implements ItemRepository {
+public class JdbcItemRepository implements ItemRepository {
 
     private static final BeanPropertyRowMapper<Item> ROW_MAPPER = new BeanPropertyRowMapper<>(Item.class);
     private final NamedParameterJdbcOperations jdbcTemplate;
@@ -92,7 +92,7 @@ public class JdbcItemDatabaseRealization implements ItemRepository {
     public void deleteItem(int id) {
         String sqlDeleteItem = """
                 DELETE FROM item
-                WHERE id = :id;            
+                WHERE id = :id          
                 """;
 
         jdbcTemplate.update(sqlDeleteItem, Map.of(

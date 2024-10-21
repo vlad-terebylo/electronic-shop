@@ -18,6 +18,6 @@ public class Item {
     private LocalDateTime producingYear;
     private String manufacturer;
     private int quantity;
-    private ItemType itemType;
+    private int itemTypeId;
 
 }
