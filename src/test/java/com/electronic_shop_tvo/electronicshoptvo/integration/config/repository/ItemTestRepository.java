@@ -1,8 +1,7 @@
-package com.electronic_shop_tvo.electronicshoptvo.repository.jdbc;
+package com.electronic_shop_tvo.electronicshoptvo.integration.config.repository;
 
 import com.electronic_shop_tvo.electronicshoptvo.exception.ItemNotFoundException;
 import com.electronic_shop_tvo.electronicshoptvo.model.Item;
-import com.electronic_shop_tvo.electronicshoptvo.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
@@ -11,28 +10,27 @@ import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class JdbcItemRepository implements ItemRepository {
+public class ItemTestRepository {
 
-    private static final BeanPropertyRowMapper<Item> ROW_MAPPER = new BeanPropertyRowMapper<>(Item.class);
+    private BeanPropertyRowMapper<Item> ROW_MAPPER = new BeanPropertyRowMapper<>(Item.class);
     private final NamedParameterJdbcOperations jdbcTemplate;
 
-    @Override
     public List<Item> getAllItems() {
-        String sqlGetAllItems = """
+        String sqlSelectAll = """
                 SELECT *
-                FROM item;
+                FROM item
                 """;
 
-        return jdbcTemplate.query(sqlGetAllItems, ROW_MAPPER);
+        return jdbcTemplate.query(sqlSelectAll, ROW_MAPPER);
     }
 
-    @Override
     public Item getItemById(int id) {
         String sqlGetItemById = """
                 SELECT *
                 FROM item
                 WHERE id = %s;
                 """;
+
         List<Item> itemList = jdbcTemplate.query(sqlGetItemById.formatted(id), ROW_MAPPER);
         if (itemList.isEmpty()) {
             throw new ItemNotFoundException("This list is empty");
@@ -42,7 +40,6 @@ public class JdbcItemRepository implements ItemRepository {
     }
 
 
-    @Override
     public List<Item> getItemsByTitle(String title) {
         String sqlGetItemsByTitle = """
                 SELECT *
@@ -51,17 +48,16 @@ public class JdbcItemRepository implements ItemRepository {
                 """;
 
         List<Item> items = jdbcTemplate.query(sqlGetItemsByTitle, Map.of(
-                "title", title
-        ), ROW_MAPPER);
+                "title", title), ROW_MAPPER);
 
         if (items.isEmpty()) {
             throw new ItemNotFoundException("This list is empty");
         }
 
+
         return items;
     }
 
-    @Override
     public void addNewItem(Item item) {
         String sqlAddItem = """
                 INSERT INTO item(title, price, producing_year, manufacturer, quantity, item_type_id)
@@ -77,7 +73,6 @@ public class JdbcItemRepository implements ItemRepository {
         ));
     }
 
-    @Override
     public void updateItem(int id, Item item) {
         String sqlUpdateItem = """
                 UPDATE item
@@ -96,15 +91,28 @@ public class JdbcItemRepository implements ItemRepository {
         ));
     }
 
-    @Override
     public void deleteItem(int id) {
         String sqlDeleteItem = """
                 DELETE FROM item
-                WHERE id = :id          
+                WHERE id = :id;          
                 """;
 
         jdbcTemplate.update(sqlDeleteItem, Map.of(
                 "id", id
         ));
+    }
+
+    public void clear() {
+        String sqlRestartItem = """
+                DELETE 
+                FROM item;
+                """;
+
+        String sqlRestartCounter = """
+                ALTER SEQUENCE item_id_seq RESTART WITH 1;
+                """;
+
+        jdbcTemplate.update(sqlRestartItem, Map.of());
+        jdbcTemplate.update(sqlRestartCounter, Map.of());
     }
 }

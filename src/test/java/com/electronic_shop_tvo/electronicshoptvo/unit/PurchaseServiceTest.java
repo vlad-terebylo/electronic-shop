@@ -67,7 +67,7 @@ public class PurchaseServiceTest {
     }
 
     @Test
-    void should_return_purchases_ny_email() {
+    void should_return_purchases_by_email() {
         String email = "terebilo.vlad1409@gmail.com";
         List<Purchase> expectedPurchases = new ArrayList<>();
 

@@ -1,8 +1,7 @@
-package com.electronic_shop_tvo.electronicshoptvo.repository.jdbc;
+package com.electronic_shop_tvo.electronicshoptvo.integration.config.repository;
 
 import com.electronic_shop_tvo.electronicshoptvo.exception.PurchaseNotFoundException;
 import com.electronic_shop_tvo.electronicshoptvo.model.Purchase;
-import com.electronic_shop_tvo.electronicshoptvo.repository.PurchaseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
@@ -11,11 +10,12 @@ import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class JdbcPurchaseRepository implements PurchaseRepository {
+public class PurchaseTestRepository {
+
     private static final BeanPropertyRowMapper<Purchase> ROW_MAPPER = new BeanPropertyRowMapper<>(Purchase.class);
     private final NamedParameterJdbcOperations jdbcTemplate;
 
-    @Override
+
     public List<Purchase> getAllPurchases() {
         String sqlGetAllPurchases = """
                 SELECT *
@@ -34,7 +34,6 @@ public class JdbcPurchaseRepository implements PurchaseRepository {
         return setItemIds(purchases, sqlGetPurchaseIds);
     }
 
-    @Override
     public Purchase getPurchaseById(int id) {
         String sqlGetPurchaseById = """
                 SELECT *
@@ -63,7 +62,6 @@ public class JdbcPurchaseRepository implements PurchaseRepository {
         return purchases.get(0).withItemIds(itemIds);
     }
 
-    @Override
     public List<Purchase> getPurchasesByCard(String cardNumber) {
         String sqlGetPurchasesByCard = """
                 SELECT *
@@ -88,7 +86,6 @@ public class JdbcPurchaseRepository implements PurchaseRepository {
         return setItemIds(purchases, sqlGetPurchaseIds);
     }
 
-    @Override
     public List<Purchase> getPurchasesByEmail(String email) {
         String sqlGetPurchasesByEmail = """
                 SELECT *
@@ -127,7 +124,6 @@ public class JdbcPurchaseRepository implements PurchaseRepository {
         return purchases;
     }
 
-    @Override
     public void save(Purchase purchase) {
         String sqlAddCustomerInfo = """
                 INSERT INTO customer_purchase(email, card_number)
@@ -153,5 +149,31 @@ public class JdbcPurchaseRepository implements PurchaseRepository {
                     "item_id", itemId
             ));
         }
+    }
+
+    public void clear() {
+        String sqlRestartCustomerPurchase = """
+                DELETE 
+                FROM customer_purchase;
+                """;
+
+        String sqlRestartPurchaseItem = """
+                DELETE
+                FROM purchase_item;
+                """;
+
+        String sqlRestartCustomerPurchaseId = """
+                ALTER SEQUENCE customer_purchase_id_seq RESTART WITH 1;
+                """;
+
+        String sqlRestartPurchaseItemId = """
+                ALTER SEQUENCE purchase_item_id_seq RESTART WITH 1;
+                """;
+
+
+        jdbcTemplate.update(sqlRestartPurchaseItem, Map.of());
+        jdbcTemplate.update(sqlRestartPurchaseItemId, Map.of());
+        jdbcTemplate.update(sqlRestartCustomerPurchase, Map.of());
+        jdbcTemplate.update(sqlRestartCustomerPurchaseId, Map.of());
     }
 }

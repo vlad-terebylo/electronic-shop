@@ -1,5 +1,6 @@
 package com.electronic_shop_tvo.electronicshoptvo.repository.jdbc;
 
+import com.electronic_shop_tvo.electronicshoptvo.exception.UserNotFoundException;
 import com.electronic_shop_tvo.electronicshoptvo.model.User;
 import com.electronic_shop_tvo.electronicshoptvo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +24,14 @@ public class JdbcUserRepository implements UserRepository {
                 WHERE login = :login;
                 """;
 
-        return jdbcTemplate.query(sqlGetUsername, Map.of(
+        List<User> users = jdbcTemplate.query(sqlGetUsername, Map.of(
                 "login", username
         ), ROW_MAPPER);
+
+        if (users.isEmpty()) {
+            throw new UserNotFoundException("The users not found");
+        }
+
+        return users;
     }
 }
