@@ -1,12 +1,15 @@
 package com.electronic_shop_tvo.electronicshoptvo.repository.jdbc;
 
 import com.electronic_shop_tvo.electronicshoptvo.exception.ItemNotFoundException;
+import com.electronic_shop_tvo.electronicshoptvo.exception.QuantityIsUnderZeroException;
 import com.electronic_shop_tvo.electronicshoptvo.model.Item;
+import com.electronic_shop_tvo.electronicshoptvo.model.dto.RequestQuantity;
 import com.electronic_shop_tvo.electronicshoptvo.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -93,6 +96,59 @@ public class JdbcItemRepository implements ItemRepository {
                 "manufacturer", item.getManufacturer(),
                 "quantity", item.getQuantity(),
                 "item_type_id", 2
+        ));
+    }
+
+    @Override
+    public void addQuantity(int id, RequestQuantity requestQuantity) {
+
+        String sqlGetQuantity = """
+                SELECT quantity
+                FROM item
+                WHERE id = %s;
+                """;
+
+        Integer currentQuantity = jdbcTemplate.queryForObject(sqlGetQuantity.formatted(id), new HashMap<>(), Integer.class);
+        currentQuantity += requestQuantity.quantity();
+
+        String sqlUpdateQuantity = """
+                UPDATE item
+                SET quantity = :quantity
+                WHERE id = :id
+                """;
+
+        jdbcTemplate.update(sqlUpdateQuantity, Map.of(
+                "id", id,
+                "quantity", currentQuantity
+        ));
+    }
+
+    @Override
+    public void removeQuantity(int id, RequestQuantity requestQuantity) {
+
+
+        String sqlGetQuantity = """
+                SELECT quantity
+                FROM item
+                WHERE id = %s;
+                """;
+
+        Integer currentQuantity = jdbcTemplate.queryForObject(sqlGetQuantity.formatted(id), new HashMap<>(), Integer.class);
+        currentQuantity -= requestQuantity.quantity();
+
+        if (currentQuantity < 0) {
+            throw new QuantityIsUnderZeroException("The quantity is under zero");
+        }
+
+        String sqlUpdateQuantity = """
+                UPDATE item
+                SET quantity = :quantity
+                WHERE id = :id
+                """;
+
+        jdbcTemplate.update(sqlUpdateQuantity, Map.of(
+                "id", id,
+                "quantity", currentQuantity
         ));
     }
 

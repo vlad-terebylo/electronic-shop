@@ -1,6 +1,7 @@
 package com.electronic_shop_tvo.electronicshoptvo.controller;
 
 import com.electronic_shop_tvo.electronicshoptvo.model.Item;
+import com.electronic_shop_tvo.electronicshoptvo.model.dto.RequestQuantity;
 import com.electronic_shop_tvo.electronicshoptvo.service.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +38,16 @@ public class ItemController {
     @PutMapping("/{id}")
     public void updateItem(@PathVariable int id, @RequestBody Item item) {
         this.itemService.updateItem(id, item);
+    }
+
+    @PatchMapping("/add/{id}")
+    public void addQuantity(@PathVariable int id, @RequestBody RequestQuantity requestQuantity) {
+        this.itemService.addQuantity(id, requestQuantity);
+    }
+
+    @PatchMapping("/remove/{id}")
+    public void removeQuantity(@PathVariable int id, @RequestBody RequestQuantity requestQuantity) {
+        this.itemService.removeQuantity(id, requestQuantity);
     }
 
     @DeleteMapping("/{id}")
