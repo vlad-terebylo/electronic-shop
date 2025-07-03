@@ -10,7 +10,8 @@ Key Features:
   3) Quantity Adjustment: Special endpoints to add or remove quantity of an existing item, with validation (throws exceptions if resulting quantity is negative).
   4) Database Migrations: Built-in Flyway migrations to set up database schema automatically.
   5) Testing: Includes unit tests and integration tests for service layers, ensuring business logic correctness.
-Technology Stack
+     
+Technology Stack:
   1) Java
   2) Spring Boot
   3) PostgreSQL (configured via Docker Compose)
