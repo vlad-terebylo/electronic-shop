@@ -4,6 +4,7 @@ import com.electronic_shop_tvo.electronicshoptvo.model.Item;
 import com.electronic_shop_tvo.electronicshoptvo.model.dto.RequestQuantity;
 import com.electronic_shop_tvo.electronicshoptvo.service.ItemService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,12 +12,14 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/items")
+@Slf4j
 public class ItemController {
 
     private final ItemService itemService;
 
     @GetMapping
     public List<Item> getAllItems() {
+        log.info("Getting all items");
         return this.itemService.getAllItems();
     }
 
@@ -25,7 +28,7 @@ public class ItemController {
         return this.itemService.getItemById(id);
     }
 
-    @GetMapping("getByTitle/{title}")
+    @GetMapping("/getByTitle/{title}")
     public List<Item> getItemsByTitle(@PathVariable String title) {
         return this.itemService.getItemsByTitle(title);
     }

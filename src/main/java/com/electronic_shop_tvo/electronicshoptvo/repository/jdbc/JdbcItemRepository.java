@@ -76,7 +76,7 @@ public class JdbcItemRepository implements ItemRepository {
                 "producing_year", item.getProducingYear(),
                 "manufacturer", item.getManufacturer(),
                 "quantity", item.getQuantity(),
-                "item_type_id", 2
+                "item_type_id", item.getItemTypeId()
         ));
     }
 
@@ -95,22 +95,23 @@ public class JdbcItemRepository implements ItemRepository {
                 "producing_year", item.getProducingYear(),
                 "manufacturer", item.getManufacturer(),
                 "quantity", item.getQuantity(),
-                "item_type_id", 2
+                "item_type_id", item.getItemTypeId()
         ));
     }
 
     @Override
-    public void addQuantity(int id, RequestQuantity requestQuantity) {
-
+    public Integer getQuantity(int id, RequestQuantity requestQuantity) {
         String sqlGetQuantity = """
                 SELECT quantity
                 FROM item
                 WHERE id = %s;
                 """;
 
-        Integer currentQuantity = jdbcTemplate.queryForObject(sqlGetQuantity.formatted(id), new HashMap<>(), Integer.class);
-        currentQuantity += requestQuantity.quantity();
+        return jdbcTemplate.queryForObject(sqlGetQuantity.formatted(id), new HashMap<>(), Integer.class);
+    }
 
+    @Override
+    public void updateQuantity(int id, Integer newQuantity) {
         String sqlUpdateQuantity = """
                 UPDATE item
                 SET quantity = :quantity
@@ -119,36 +120,7 @@ public class JdbcItemRepository implements ItemRepository {
 
         jdbcTemplate.update(sqlUpdateQuantity, Map.of(
                 "id", id,
-                "quantity", currentQuantity
-        ));
-    }
-
-    @Override
-    public void removeQuantity(int id, RequestQuantity requestQuantity) {
-
-
-        String sqlGetQuantity = """
-                SELECT quantity
-                FROM item
-                WHERE id = %s;
-                """;
-
-        Integer currentQuantity = jdbcTemplate.queryForObject(sqlGetQuantity.formatted(id), new HashMap<>(), Integer.class);
-        currentQuantity -= requestQuantity.quantity();
-
-        if (currentQuantity < 0) {
-            throw new QuantityIsUnderZeroException("The quantity is under zero");
-        }
-
-        String sqlUpdateQuantity = """
-                UPDATE item
-                SET quantity = :quantity
-                WHERE id = :id
-                """;
-
-        jdbcTemplate.update(sqlUpdateQuantity, Map.of(
-                "id", id,
-                "quantity", currentQuantity
+                "quantity", newQuantity
         ));
     }
 

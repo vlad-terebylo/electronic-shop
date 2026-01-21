@@ -17,9 +17,9 @@ public interface ItemRepository {
 
     void updateItem(int id, Item item);
 
-    void addQuantity(int id, RequestQuantity requestQuantity);
+    Integer getQuantity(int id, RequestQuantity requestQuantity);
 
-    void removeQuantity(int id, RequestQuantity requestQuantity);
+    void updateQuantity(int id, Integer newQuantity);
 
     void deleteItem(int id);
 }
