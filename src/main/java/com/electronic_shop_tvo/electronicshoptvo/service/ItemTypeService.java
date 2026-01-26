@@ -24,4 +24,16 @@ public class ItemTypeService {
     public ItemType getItemTypeByItemId(int id) {
         return this.itemTypeRepository.getItemTypeByItemId(id);
     }
+
+    public void addItemType(ItemType itemType) {
+        this.itemTypeRepository.addItemType(itemType);
+    }
+
+    public void updateItemType(int id, ItemType itemType) {
+        this.itemTypeRepository.updateItemType(id, itemType);
+    }
+
+    public void deleteItemType(int id) {
+        this.itemTypeRepository.deleteItemType(id);
+    }
 }

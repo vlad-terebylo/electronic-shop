@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 public class JdbcItemTypeRepository implements ItemTypeRepository {
@@ -39,5 +40,42 @@ public class JdbcItemTypeRepository implements ItemTypeRepository {
         }
 
         return itemTypeList.get(0);
+    }
+
+    @Override
+    public void addItemType(ItemType itemType) {
+        String sqlAddItemType = """
+                INSERT INTO item_type(title)
+                VALUES(:title);            
+                """;
+        jdbcTemplate.update(sqlAddItemType, Map.of(
+                "title", itemType.getTitle()
+        ));
+    }
+
+    @Override
+    public void updateItemType(int id, ItemType itemType) {
+        String sqlUpdateItem = """
+                UPDATE item_type
+                SET title = :title
+                WHERE id = :id;
+                """;
+
+        jdbcTemplate.update(sqlUpdateItem, Map.of(
+                "id", id,
+                "title", itemType.getTitle()
+        ));
+    }
+
+    @Override
+    public void deleteItemType(int id) {
+        String sqlDeleteItem = """
+                DELETE FROM item_type
+                WHERE id = :id
+                """;
+
+        jdbcTemplate.update(sqlDeleteItem, Map.of(
+                "id", id
+        ));
     }
 }

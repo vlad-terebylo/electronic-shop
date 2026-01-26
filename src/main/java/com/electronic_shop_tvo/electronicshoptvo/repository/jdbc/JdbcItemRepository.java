@@ -70,6 +70,7 @@ public class JdbcItemRepository implements ItemRepository {
                 INSERT INTO item(title, price, producing_year, manufacturer, quantity, item_type_id)
                 VALUES(:title, :price, :producing_year, :manufacturer, :quantity, :item_type_id);
                 """;
+
         jdbcTemplate.update(sqlAddItem, Map.of(
                 "title", item.getTitle(),
                 "price", item.getPrice(),

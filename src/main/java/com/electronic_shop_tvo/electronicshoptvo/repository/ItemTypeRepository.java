@@ -9,4 +9,10 @@ public interface ItemTypeRepository {
     List<ItemType> getAllItemTypes();
 
     ItemType getItemTypeByItemId(int id);
+
+    void addItemType(ItemType itemType);
+
+    void updateItemType(int id, ItemType itemType);
+
+    void deleteItemType(int id);
 }
