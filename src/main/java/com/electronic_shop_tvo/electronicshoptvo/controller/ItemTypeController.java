@@ -1,7 +1,11 @@
 package com.electronic_shop_tvo.electronicshoptvo.controller;
 
 import com.electronic_shop_tvo.electronicshoptvo.model.ItemType;
+import com.electronic_shop_tvo.electronicshoptvo.model.dto.itemType.CreateItemTypeDto;
+import com.electronic_shop_tvo.electronicshoptvo.model.dto.itemType.ItemTypeDto;
+import com.electronic_shop_tvo.electronicshoptvo.model.dto.itemType.UpdateItemTypeDto;
 import com.electronic_shop_tvo.electronicshoptvo.service.ItemTypeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -17,25 +21,35 @@ public class ItemTypeController {
     private final ItemTypeService itemTypeService;
 
     @GetMapping
-    public List<ItemType> getAllItemTypes() {
+    public List<ItemTypeDto> getAllItemTypes() {
         log.info("Getting all item types");
-        return this.itemTypeService.getAllItemTypes();
+
+        return this.itemTypeService.getAllItemTypes().stream()
+                .map(itemType -> new ItemTypeDto(
+                        itemType.getTitle())
+                )
+                .toList();
     }
 
     @GetMapping("/{id}")
-    public ItemType getItemTypeById(@PathVariable int id) {
+    public ItemTypeDto getItemTypeById(@PathVariable int id) {
         log.info("Getting item type by id");
-        return this.itemTypeService.getItemTypeByItemId(id);
+        ItemType itemType = this.itemTypeService.getItemTypeByItemId(id);
+
+        return new ItemTypeDto
+                (
+                        itemType.getTitle()
+                );
     }
 
     @PostMapping
-    public void addItemType(@RequestBody ItemType itemType) {
-        this.itemTypeService.addItemType(itemType);
+    public void addItemType(@Valid @RequestBody CreateItemTypeDto createItemTypeDto) {
+        this.itemTypeService.addItemType(new ItemType(createItemTypeDto));
     }
 
     @PatchMapping("/{id}")
-    public void updateItemType(@PathVariable int id, @RequestBody ItemType itemType) {
-        this.itemTypeService.updateItemType(id, itemType);
+    public void updateItemType(@PathVariable int id, @Valid @RequestBody UpdateItemTypeDto updateItemTypeDto) {
+        this.itemTypeService.updateItemType(id, new ItemType(updateItemTypeDto));
     }
 
     @DeleteMapping("/{id}")

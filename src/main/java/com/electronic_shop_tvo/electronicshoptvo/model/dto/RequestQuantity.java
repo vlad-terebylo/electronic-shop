@@ -1,4 +1,10 @@
 package com.electronic_shop_tvo.electronicshoptvo.model.dto;
 
-public record RequestQuantity (int quantity){
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
+public record RequestQuantity
+        (
+                @NotNull @Positive Integer quantity
+        ) {
 }
