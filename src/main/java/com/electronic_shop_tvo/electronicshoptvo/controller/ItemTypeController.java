@@ -25,35 +25,35 @@ public class ItemTypeController {
         log.info("Getting all item types");
 
         return this.itemTypeService.getAllItemTypes().stream()
-                .map(itemType -> new ItemTypeDto(
-                        itemType.getTitle())
-                )
+                .map(ItemTypeDto::new)
                 .toList();
     }
 
     @GetMapping("/{id}")
     public ItemTypeDto getItemTypeById(@PathVariable int id) {
-        log.info("Getting item type by id");
-        ItemType itemType = this.itemTypeService.getItemTypeByItemId(id);
+        log.info("Getting item type by id: {}", id);
 
-        return new ItemTypeDto
-                (
-                        itemType.getTitle()
-                );
+        return new ItemTypeDto(itemTypeService.getItemTypeByItemId(id));
     }
 
     @PostMapping
     public void addItemType(@Valid @RequestBody CreateItemTypeDto createItemTypeDto) {
-        this.itemTypeService.addItemType(new ItemType(createItemTypeDto));
+        log.info("Adding new item type");
+
+        this.itemTypeService.addItemType(createItemTypeDto.toDomain());
     }
 
     @PatchMapping("/{id}")
     public void updateItemType(@PathVariable int id, @Valid @RequestBody UpdateItemTypeDto updateItemTypeDto) {
-        this.itemTypeService.updateItemType(id, new ItemType(updateItemTypeDto));
+        log.info("Updating an item type with id: {}", id);
+
+        this.itemTypeService.updateItemType(id, updateItemTypeDto.toDomain());
     }
 
     @DeleteMapping("/{id}")
     public void deleteItemType(@PathVariable int id) {
+        log.info("Deleting item with id: {}", id);
+
         this.itemTypeService.deleteItemType(id);
     }
 }

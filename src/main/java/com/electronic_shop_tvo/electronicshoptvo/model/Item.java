@@ -11,8 +11,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class Item {
 
     private int id;
@@ -23,28 +23,27 @@ public class Item {
     private int quantity;
     private int itemTypeId;
 
-    public Item(ItemDto itemDto) {
-        this.title = itemDto.title();
-        this.price = itemDto.price();
-        this.producingYear = itemDto.producingYear();
-        this.manufacturer = itemDto.manufacturer();
-        this.quantity = itemDto.quantity();
-        this.itemTypeId = itemDto.itemTypeId();
+    public Item(String title,
+                BigDecimal price,
+                LocalDateTime producingYear,
+                String manufacturer,
+                int quantity,
+                int itemTypeId) {
+        this.title = title;
+        this.price = price;
+        this.producingYear = producingYear;
+        this.manufacturer = manufacturer;
+        this.quantity = quantity;
+        this.itemTypeId = itemTypeId;
     }
 
-    public Item(CreateItemDto createItemDto) {
-        this.title = createItemDto.title();
-        this.price = createItemDto.price();
-        this.producingYear = createItemDto.producingYear();
-        this.manufacturer = createItemDto.manufacturer();
-        this.quantity = createItemDto.quantity();
-        this.itemTypeId = createItemDto.itemTypeId();
-    }
-
-    public Item(UpdateItemDto updateItemDto) {
-        this.title = updateItemDto.title();
-        this.price = updateItemDto.price();
-        this.quantity = updateItemDto.quantity();
-        this.itemTypeId = updateItemDto.itemTypeId();
+    public Item(String title,
+                BigDecimal price,
+                int quantity,
+                int itemTypeId) {
+        this.title = title;
+        this.price = price;
+        this.quantity = quantity;
+        this.itemTypeId = itemTypeId;
     }
 }

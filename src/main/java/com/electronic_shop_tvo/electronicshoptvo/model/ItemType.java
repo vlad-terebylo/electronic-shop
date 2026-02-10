@@ -14,15 +14,7 @@ public class ItemType {
     private int id;
     private String title;
 
-    public ItemType(ItemTypeDto itemTypeDto) {
-        this.title = itemTypeDto.title();
-    }
-
-    public ItemType(CreateItemTypeDto createItemTypeDto) {
-        this.title = createItemTypeDto.title();
-    }
-
-    public ItemType(UpdateItemTypeDto updateItemTypeDto) {
-        this.title = updateItemTypeDto.title();
+    public ItemType(String title) {
+        this.title = title;
     }
 }

@@ -1,9 +1,8 @@
 package com.electronic_shop_tvo.electronicshoptvo.repository.jdbc;
 
 import com.electronic_shop_tvo.electronicshoptvo.exception.ItemNotFoundException;
-import com.electronic_shop_tvo.electronicshoptvo.exception.QuantityIsUnderZeroException;
 import com.electronic_shop_tvo.electronicshoptvo.model.Item;
-import com.electronic_shop_tvo.electronicshoptvo.model.dto.RequestQuantity;
+import com.electronic_shop_tvo.electronicshoptvo.model.dto.RequestQuantityDto;
 import com.electronic_shop_tvo.electronicshoptvo.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -101,7 +100,7 @@ public class JdbcItemRepository implements ItemRepository {
     }
 
     @Override
-    public Integer getQuantity(int id, RequestQuantity requestQuantity) {
+    public Integer getQuantity(int id, Integer quantity) {
         String sqlGetQuantity = """
                 SELECT quantity
                 FROM item
