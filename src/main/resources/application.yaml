@@ -5,8 +5,13 @@ spring:
     url: jdbc:postgresql://localhost:5432/electronic_shop_tvo
     username: root
     password: pokus
+#  security:
+#    oauth2:
+#      resourceserver:
+#        jwt:
+#          issuer-uri: https://login.microsoftonline.com/{tenant-id}/discovery/v2.0/keys
 
 server:
   port: 1409
   servlet:
-    context-path: "/shop"
+    context-path: "/api"

@@ -1,0 +1,5 @@
+ALTER TABLE customer_purchase
+    ADD COLUMN total_price INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE purchase_item
+    ADD COLUMN quantity INTEGER NOT NULL DEFAULT 0;

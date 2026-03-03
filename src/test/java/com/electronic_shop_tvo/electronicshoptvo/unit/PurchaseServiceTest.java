@@ -1,6 +1,7 @@
 package com.electronic_shop_tvo.electronicshoptvo.unit;
 
 import com.electronic_shop_tvo.electronicshoptvo.model.Purchase;
+import com.electronic_shop_tvo.electronicshoptvo.model.PurchaseItem;
 import com.electronic_shop_tvo.electronicshoptvo.repository.PurchaseRepository;
 import com.electronic_shop_tvo.electronicshoptvo.service.PurchaseService;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,10 +28,18 @@ public class PurchaseServiceTest {
 
     @Test
     void should_return_all_purchases() {
+        String card = "675831-1-4567889";
         List<Purchase> expectedPurchases = new ArrayList<>();
 
-        expectedPurchases.add(new Purchase(1, "terebilo.vlad1409@gmail.com", "675831-1-4567889", List.of(2, 3)));
+        PurchaseItem purchaseItem = new PurchaseItem(1, 5);
+        PurchaseItem secondPurchaseItem = new PurchaseItem(2, 5);
 
+        expectedPurchases.add(new Purchase(
+                1,
+                "terebilo.vlad1409@gmail.com",
+                card,
+                List.of(purchaseItem, secondPurchaseItem),
+                BigDecimal.valueOf(1000)));
         when(purchaseRepository.getAllPurchases()).thenReturn(expectedPurchases);
 
         List<Purchase> result = purchaseService.getAllPurchases();
@@ -40,7 +50,15 @@ public class PurchaseServiceTest {
     @Test
     void should_return_purchase_by_id() {
         int id = 1;
-        Purchase expectedPurchase = new Purchase(id, "terebilo.vlad1409@gmail.com", "675831-1-4567889", List.of(2, 3));
+        PurchaseItem purchaseItem = new PurchaseItem(1, 5);
+        PurchaseItem secondPurchaseItem = new PurchaseItem(2, 5);
+
+        Purchase expectedPurchase = new Purchase(
+                id,
+                "terebilo.vlad1409@gmail.com",
+                "675831-1-4567889",
+                List.of(purchaseItem, secondPurchaseItem),
+                BigDecimal.valueOf(1000));
 
         when(purchaseRepository.getPurchaseById(id)).thenReturn(expectedPurchase);
 
@@ -50,42 +68,15 @@ public class PurchaseServiceTest {
     }
 
     @Test
-    void should_return_purchases_by_card() {
-        String card = "675831-1-4567889";
-        List<Purchase> expectedPurchases = new ArrayList<>();
-
-        expectedPurchases.add(new Purchase(
-                1,
-                "terebilo.vlad1409@gmail.com",
-                card, List.of(2, 3)));
-
-        when(purchaseRepository.getPurchasesByCard(card)).thenReturn(expectedPurchases);
-
-        List<Purchase> result = purchaseService.getPurchasesByCard(card);
-
-        assertEquals(expectedPurchases, result);
-    }
-
-    @Test
-    void should_return_purchases_by_email() {
-        String email = "terebilo.vlad1409@gmail.com";
-        List<Purchase> expectedPurchases = new ArrayList<>();
-
-        expectedPurchases.add(new Purchase(
-                1,
-                email,
-                "675831-1-4567889", List.of(2, 3)));
-
-        when(purchaseRepository.getPurchasesByEmail(email)).thenReturn(expectedPurchases);
-
-        List<Purchase> result = purchaseService.getPurchasesByEmail(email);
-
-        assertEquals(expectedPurchases, result);
-    }
-
-    @Test
     void should_add_new_purchase() {
-        Purchase purchase = new Purchase(1, "terebilo.vlad1409@gmail.com", "675831-1-4567889", List.of(2, 3));
+        PurchaseItem purchaseItem = new PurchaseItem(1, 5);
+        PurchaseItem secondPurchaseItem = new PurchaseItem(2, 5);
+
+        Purchase purchase = new Purchase(1,
+                "terebilo.vlad1409@gmail.com",
+                "675831-1-4567889",
+                List.of(purchaseItem, secondPurchaseItem),
+                BigDecimal.valueOf(1000));
 
         purchaseService.addNewPurchase(purchase);
 

@@ -11,9 +11,5 @@ public interface PurchaseRepository {
 
     Purchase getPurchaseById(int id);
 
-    List<Purchase> getPurchasesByCard(String cardNumber);
-
-    List<Purchase> getPurchasesByEmail(String email);
-
     void save(Purchase purchase);
 }

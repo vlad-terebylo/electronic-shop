@@ -14,10 +14,21 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateItemDto {
-    @NotBlank @Size(min = 2, max = 30) String title;
-    @NotNull @Positive BigDecimal price;
-    @NotNull @Positive Integer quantity;
-    @NotNull Integer itemTypeId;
+
+    @NotBlank
+    @Size(min = 2, max = 30)
+    private String title;
+
+    @NotNull
+    @Positive
+    private BigDecimal price;
+
+    @NotNull
+    @Positive
+    private Integer quantity;
+
+    @NotNull
+    private Integer itemTypeId;
 
     public Item toDomain() {
         return new Item(

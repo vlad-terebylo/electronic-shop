@@ -2,6 +2,7 @@ package com.electronic_shop_tvo.electronicshoptvo.integration.config.repository;
 
 import com.electronic_shop_tvo.electronicshoptvo.exception.PurchaseNotFoundException;
 import com.electronic_shop_tvo.electronicshoptvo.model.Purchase;
+import com.electronic_shop_tvo.electronicshoptvo.model.PurchaseItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
@@ -17,136 +18,109 @@ public class PurchaseTestRepository {
 
 
     public List<Purchase> getAllPurchases() {
-        String sqlGetAllPurchases = """
-                SELECT *
-                FROM customer_purchase
-                """;
+        String sqlPurchases = """
+            SELECT *
+            FROM customer_purchase
+            """;
 
-        String sqlGetPurchaseIds = """
-                SELECT item_id
-                FROM purchase_item
-                WHERE purchase_id = :id
-                """;
+        String sqlPurchaseItems = """
+            SELECT item_id, quantity
+            FROM purchase_item
+            WHERE purchase_id = :id
+            """;
 
+        List<Purchase> purchases = jdbcTemplate.query(sqlPurchases, ROW_MAPPER);
 
-        List<Purchase> purchases = jdbcTemplate.query(sqlGetAllPurchases, ROW_MAPPER);
-
-        return setItemIds(purchases, sqlGetPurchaseIds);
-    }
-
-    public Purchase getPurchaseById(int id) {
-        String sqlGetPurchaseById = """
-                SELECT *
-                FROM customer_purchase
-                WHERE id = :id
-                """;
-
-        String sqlGetPurchaseIds = """
-                SELECT item_id
-                FROM purchase_item
-                WHERE purchase_id = :id
-                """;
-
-        List<Purchase> purchases = jdbcTemplate.query(sqlGetPurchaseById, Map.of(
-                "id", id
-        ), ROW_MAPPER);
-
-        List<Integer> itemIds = jdbcTemplate.queryForList(sqlGetPurchaseIds, Map.of(
-                "id", id
-        ), Integer.class);
-
-        if (purchases.isEmpty()) {
-            throw new PurchaseNotFoundException("No purchase found by id " + id);
-        }
-
-        return purchases.get(0).withItemIds(itemIds);
-    }
-
-    public List<Purchase> getPurchasesByCard(String cardNumber) {
-        String sqlGetPurchasesByCard = """
-                SELECT *
-                FROM customer_purchase
-                WHERE card_number = :card_number
-                """;
-
-        String sqlGetPurchaseIds = """
-                SELECT item_id
-                FROM purchase_item
-                WHERE purchase_id = :id
-                """;
-
-        List<Purchase> purchases = jdbcTemplate.query(sqlGetPurchasesByCard, Map.of(
-                "card_number", cardNumber
-        ), ROW_MAPPER);
-
-        if (purchases.isEmpty()) {
-            throw new PurchaseNotFoundException("The purchases not found");
-        }
-
-        return setItemIds(purchases, sqlGetPurchaseIds);
-    }
-
-    public List<Purchase> getPurchasesByEmail(String email) {
-        String sqlGetPurchasesByEmail = """
-                SELECT *
-                FROM customer_purchase
-                WHERE email = :email
-                """;
-
-        String sqlGetItemIds = """
-                SELECT item_id
-                FROM purchase_item
-                WHERE purchase_id = :id
-                """;
-
-        List<Purchase> purchases = jdbcTemplate.query(sqlGetPurchasesByEmail, Map.of(
-                "email", email
-        ), ROW_MAPPER);
-
-        if (purchases.isEmpty()) {
-            throw new PurchaseNotFoundException("The purchases not found");
-        }
-
-        return setItemIds(purchases, sqlGetItemIds);
-    }
-
-    private List<Purchase> setItemIds(List<Purchase> purchases, String sqlQuery) {
         for (Purchase purchase : purchases) {
-            int id = purchase.getId();
 
-            List<Integer> itemIds = jdbcTemplate.queryForList(sqlQuery, Map.of(
-                    "id", id
-            ), Integer.class);
+            List<PurchaseItem> items = jdbcTemplate.query(
+                    sqlPurchaseItems,
+                    Map.of("id", purchase.getId()),
+                    (rs, rowNum) -> {
 
-            purchase.setItemIds(itemIds);
+                        PurchaseItem item = new PurchaseItem();
+                        item.setItemId(rs.getInt("item_id"));
+                        item.setQuantity(rs.getInt("quantity"));
+
+                        return item;
+                    }
+            );
+
+            purchase.setPurchaseItems(items);
         }
 
         return purchases;
     }
 
+    public Purchase getPurchaseById(int id) {
+
+        String sqlGetPurchase = """
+            SELECT *
+            FROM customer_purchase
+            WHERE id = :id
+            """;
+
+        String sqlGetPurchaseItems = """
+                SELECT item_id, quantity
+                FROM purchase_item
+                WHERE purchase_id = :id
+                """;
+
+        List<Purchase> purchases = jdbcTemplate.query(
+                sqlGetPurchase,
+                Map.of("id", id),
+                ROW_MAPPER
+        );
+
+        if (purchases.isEmpty()) {
+            throw new PurchaseNotFoundException("No purchase found by id " + id);
+        }
+
+        Purchase purchase = purchases.get(0);
+
+        List<PurchaseItem> items = jdbcTemplate.query(
+                sqlGetPurchaseItems,
+                Map.of("id", id),
+                (rs, rowNum) -> {
+
+                    PurchaseItem item = new PurchaseItem();
+                    item.setItemId(rs.getInt("item_id"));
+                    item.setQuantity(rs.getInt("quantity"));
+
+                    return item;
+                }
+        );
+
+        purchase.setPurchaseItems(items);
+
+        return purchase;
+    }
+
     public void save(Purchase purchase) {
         String sqlAddCustomerInfo = """
-                INSERT INTO customer_purchase(email, card_number)
-                VALUES(:email, :cardNumber)
+                INSERT INTO customer_purchase(email, card_number, total_price)
+                VALUES(:email, :cardNumber, :totalPrice)
                 RETURNING id
                 """;
 
         String sqlAddPurchaseItem = """
-                INSERT INTO purchase_item(purchase_id, item_id)
-                VALUES(:purchase_id, :item_id)
+                INSERT INTO purchase_item(purchase_id, item_id, quantity)
+                VALUES(:purchase_id, :item_id, :quantity)
                 """;
 
         int id = jdbcTemplate.queryForObject(sqlAddCustomerInfo, Map.of(
                 "email", purchase.getEmail(),
-                "cardNumber", purchase.getCardNumber()
+                "cardNumber", purchase.getCardNumber(),
+                "totalPrice", purchase.getTotalPrice()
         ), Integer.class);
 
-        List<Integer> itemIds = purchase.getItemIds();
+        List<PurchaseItem> purchaseItems = purchase.getPurchaseItems();
 
-        for (Integer itemId : itemIds) {
+        for (PurchaseItem purchaseItem : purchaseItems) {
             jdbcTemplate.update(sqlAddPurchaseItem, Map.of(
                     "purchase_id", id,
-                    "item_id", itemId
+                    "item_id", purchaseItem.getItemId(),
+                    "quantity", purchaseItem.getQuantity()
             ));
         }
     }

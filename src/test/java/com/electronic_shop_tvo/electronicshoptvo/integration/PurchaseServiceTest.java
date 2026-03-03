@@ -4,6 +4,7 @@ import com.electronic_shop_tvo.electronicshoptvo.integration.config.repository.I
 import com.electronic_shop_tvo.electronicshoptvo.integration.config.repository.PurchaseTestRepository;
 import com.electronic_shop_tvo.electronicshoptvo.model.Item;
 import com.electronic_shop_tvo.electronicshoptvo.model.Purchase;
+import com.electronic_shop_tvo.electronicshoptvo.model.PurchaseItem;
 import com.electronic_shop_tvo.electronicshoptvo.service.PurchaseService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +51,14 @@ public class PurchaseServiceTest extends BaseTest {
                 LocalDateTime.of(2024, 1, 1, 0, 0),
                 "Apple", 50, 2);
 
-        Purchase purchase = new Purchase(id, "terebilo.vlad1409@gmail.com", "675831-1-4567889", List.of(id));
+        PurchaseItem purchaseItem = new PurchaseItem(id, 5);
+
+        Purchase purchase = new Purchase(
+                id,
+                "terebilo.vlad1409@gmail.com",
+                "675831-1-4567889",
+                List.of(purchaseItem),
+                item.getPrice().multiply(BigDecimal.valueOf(purchaseItem.getQuantity())));
 
         itemTestRepository.addNewItem(item);
         purchaseService.addNewPurchase(purchase);
@@ -60,49 +68,19 @@ public class PurchaseServiceTest extends BaseTest {
     }
 
     @Test
-    void should_return_purchases_by_card() {
-        int id = 1;
-        String card = "675831-1-4567889";
-
-        Item item = new Item(id, "MacBook Pro", BigDecimal.valueOf(1000),
-                LocalDateTime.of(2024, 1, 1, 0, 0),
-                "Apple", 50, 2);
-
-        Purchase purchase = new Purchase(id, "terebilo.vlad1409@gmail.com", card, List.of(id));
-
-        itemTestRepository.addNewItem(item);
-        purchaseService.addNewPurchase(purchase);
-
-        List<Purchase> result = purchaseService.getPurchasesByCard(card);
-        assertEquals(purchase, result.get(0));
-    }
-
-    @Test
-    void should_return_purchases_by_email() {
-        int id = 1;
-        String email = "terebilo.vlad1409@gmail.com";
-
-        Item item = new Item(id, "MacBook Pro", BigDecimal.valueOf(1000),
-                LocalDateTime.of(2024, 1, 1, 0, 0),
-                "Apple", 50, 2);
-
-        Purchase purchase = new Purchase(id, email, "675831-1-4567889", List.of(id));
-
-        itemTestRepository.addNewItem(item);
-        purchaseService.addNewPurchase(purchase);
-
-        List<Purchase> result = purchaseService.getPurchasesByEmail(email);
-        assertEquals(purchase, result.get(0));
-    }
-
-    @Test
     void should_add_new_purchase() {
         Item item = new Item(1, "MacBook Pro", BigDecimal.valueOf(1000),
                 LocalDateTime.of(2024, 1, 1, 0, 0),
                 "Apple", 50, 2);
 
-        Purchase purchase = new Purchase(1, "terebilo.vlad1409@gmail.com", "675831-1-4567889", List.of(1));
+        PurchaseItem purchaseItem = new PurchaseItem(1, 5);
 
+        Purchase purchase = new Purchase(
+                1,
+                "terebilo.vlad1409@gmail.com",
+                "675831-1-4567889",
+                List.of(purchaseItem),
+                item.getPrice().multiply(BigDecimal.valueOf(purchaseItem.getQuantity())));
         itemTestRepository.addNewItem(item);
         purchaseService.addNewPurchase(purchase);
 

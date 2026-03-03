@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateItemDto {
+
     @NotBlank
     @Size(min = 2, max = 30)
     private String title;
@@ -36,15 +37,6 @@ public class CreateItemDto {
 
     @NotNull
     private Integer itemTypeId;
-
-    public CreateItemDto(Item item) {
-        this.title = item.getTitle();
-        this.price = item.getPrice();
-        this.producingYear = item.getProducingYear();
-        this.manufacturer = item.getManufacturer();
-        this.quantity = item.getQuantity();
-        this.itemTypeId = item.getItemTypeId();
-    }
 
     public Item toDomain() {
         return new Item(
