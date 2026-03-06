@@ -52,8 +52,6 @@ public class JdbcPurchaseRepository implements PurchaseRepository {
                     purchase.setTotalPrice(rs.getBigDecimal("total_price"));
                     purchase.setPurchaseItems(new ArrayList<>());
 
-                    purchase.setPurchaseItems(new ArrayList<>());
-
                     purchaseMap.put(purchaseId, purchase);
                 }
 

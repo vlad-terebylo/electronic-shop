@@ -42,6 +42,8 @@ public class PurchaseService {
 
             BigDecimal itemTotal = price.multiply(BigDecimal.valueOf(quantity));
             totalPrice = totalPrice.add(itemTotal);
+
+            itemRepository.updateQuantity(id, item.getQuantity() - quantity);
         }
 
         purchase.setTotalPrice(totalPrice);

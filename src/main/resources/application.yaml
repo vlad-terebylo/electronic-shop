@@ -5,11 +5,23 @@ spring:
     url: jdbc:postgresql://localhost:5432/electronic_shop_tvo
     username: root
     password: pokus
-#  security:
-#    oauth2:
-#      resourceserver:
-#        jwt:
-#          issuer-uri: https://login.microsoftonline.com/{tenant-id}/discovery/v2.0/keys
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${ISSIE_URL}
+      client:
+        registration:
+          azure:
+            client-id: ${CLIENT_ID}
+            client-secret: ${CLIENT_SECRET}
+            scope:
+              - openid
+              - profile
+              - email
+        provider:
+          azure:
+            issuer-uri: ${ISSIE_URL}
 
 server:
   port: 1409
