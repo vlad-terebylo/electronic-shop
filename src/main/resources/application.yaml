@@ -2,27 +2,17 @@ spring:
   flyway:
     locations: db/migrations
   datasource:
-    url: jdbc:postgresql://localhost:5432/electronic_shop_tvo
-    username: root
-    password: pokus
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/electronic_shop_tvo}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:pokus}
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${ISSIE_URL}
-      client:
-        registration:
-          azure:
-            client-id: ${CLIENT_ID}
-            client-secret: ${CLIENT_SECRET}
-            scope:
-              - openid
-              - profile
-              - email
-        provider:
-          azure:
-            issuer-uri: ${ISSIE_URL}
-
+          issuer-uri: ${AZURE_ISSUER_URI}
+          audiences:
+            - ${AZURE_CLIENT_ID}
+            - api://${AZURE_CLIENT_ID}
 server:
   port: 1409
   servlet:

@@ -1,4 +1,4 @@
-package com.electronic_shop_tvo.electronicshoptvo.controller;
+package com.electronic_shop_tvo.electronicshoptvo.controller.authorized;
 
 import com.electronic_shop_tvo.electronicshoptvo.model.dto.purchase.CreatePurchaseDto;
 import com.electronic_shop_tvo.electronicshoptvo.model.dto.purchase.PurchaseDto;
@@ -13,7 +13,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/purchase")
+@RequestMapping("/authenticated/purchase")
 public class PurchaseController {
 
     private final PurchaseService purchaseService;

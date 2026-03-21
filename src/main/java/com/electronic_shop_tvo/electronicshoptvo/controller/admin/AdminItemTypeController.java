@@ -1,8 +1,6 @@
-package com.electronic_shop_tvo.electronicshoptvo.controller;
+package com.electronic_shop_tvo.electronicshoptvo.controller.admin;
 
-import com.electronic_shop_tvo.electronicshoptvo.model.ItemType;
 import com.electronic_shop_tvo.electronicshoptvo.model.dto.itemType.CreateItemTypeDto;
-import com.electronic_shop_tvo.electronicshoptvo.model.dto.itemType.ItemTypeDto;
 import com.electronic_shop_tvo.electronicshoptvo.model.dto.itemType.UpdateItemTypeDto;
 import com.electronic_shop_tvo.electronicshoptvo.service.ItemTypeService;
 import jakarta.validation.Valid;
@@ -10,31 +8,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+@Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/itemTypes")
-@Slf4j
-public class ItemTypeController {
-
+@RequestMapping("/admin/itemTypes")
+public class AdminItemTypeController {
     private final ItemTypeService itemTypeService;
-
-    @GetMapping
-    public List<ItemTypeDto> getAllItemTypes() {
-        log.info("Getting all item types");
-
-        return this.itemTypeService.getAllItemTypes().stream()
-                .map(ItemTypeDto::new)
-                .toList();
-    }
-
-    @GetMapping("/{id}")
-    public ItemTypeDto getItemTypeById(@PathVariable int id) {
-        log.info("Getting item type by id: {}", id);
-
-        return new ItemTypeDto(itemTypeService.getItemTypeByItemId(id));
-    }
 
     @PostMapping
     public void addItemType(@Valid @RequestBody CreateItemTypeDto createItemTypeDto) {

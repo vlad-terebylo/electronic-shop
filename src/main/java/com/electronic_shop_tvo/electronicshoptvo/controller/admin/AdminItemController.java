@@ -1,9 +1,7 @@
-package com.electronic_shop_tvo.electronicshoptvo.controller;
+package com.electronic_shop_tvo.electronicshoptvo.controller.admin;
 
-import com.electronic_shop_tvo.electronicshoptvo.model.Item;
 import com.electronic_shop_tvo.electronicshoptvo.model.dto.RequestQuantityDto;
 import com.electronic_shop_tvo.electronicshoptvo.model.dto.item.CreateItemDto;
-import com.electronic_shop_tvo.electronicshoptvo.model.dto.item.ItemDto;
 import com.electronic_shop_tvo.electronicshoptvo.model.dto.item.UpdateItemDto;
 import com.electronic_shop_tvo.electronicshoptvo.service.ItemService;
 import jakarta.validation.Valid;
@@ -11,44 +9,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+@Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/items")
-@Slf4j
-public class ItemController {
-
+@RequestMapping("/admin/items")
+public class AdminItemController {
     private final ItemService itemService;
-
-    @GetMapping
-    public List<ItemDto> getAllItems() {
-        log.info("Getting all items");
-
-        return itemService.getAllItems().stream()
-                .map(ItemDto::new)
-                .toList();
-    }
-
-    @GetMapping("/{id}")
-    public ItemDto getItemById(@PathVariable int id) {
-        log.info("Getting item by id: {}", id);
-
-        return new ItemDto(this.itemService.getItemById(id));
-    }
-
-    @GetMapping("/getByTitle/{title}")
-    public List<ItemDto> getItemsByTitle(@PathVariable String title) {
-        log.info("Getting item by title: {}", title);
-
-        return itemService.getItemsByTitle(title).stream()
-                .map(ItemDto::new)
-                .toList();
-    }
 
     @PostMapping
     public void addNewItem(@Valid @RequestBody CreateItemDto createItemDto) {
-        log.info("Adding new item");
+        log.info("Adding new item {}", createItemDto);
 
         this.itemService.addNewItem(createItemDto.toDomain());
     }
@@ -80,5 +50,4 @@ public class ItemController {
 
         this.itemService.deleteItem(id);
     }
-
 }
