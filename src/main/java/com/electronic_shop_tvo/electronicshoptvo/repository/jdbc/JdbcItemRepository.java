@@ -66,6 +66,53 @@ public class JdbcItemRepository implements ItemRepository {
 
     @Override
     public void addNewItem(Item item) {
+
+        String sqlFind = """
+                SELECT id, is_removed
+                FROM item
+                WHERE title = :title AND item_type_id = :item_type_id
+                LIMIT 1;
+                """;
+
+        List<Map<String, Object>> existingItems = jdbcTemplate.queryForList(sqlFind, Map.of(
+                "title", item.getTitle(),
+                "item_type_id", item.getItemTypeId()
+        ));
+
+        if (!existingItems.isEmpty()) {
+            Map<String, Object> existing = existingItems.get(0);
+
+            Long id = ((Number) existing.get("id")).longValue();
+            Boolean isRemoved = (Boolean) existing.get("is_removed");
+
+            if (Boolean.TRUE.equals(isRemoved)) {
+                String sqlUpdate = """
+                        UPDATE item
+                        SET 
+                            is_removed = false,
+                            price = :price,
+                            producing_year = :producing_year,
+                            manufacturer = :manufacturer,
+                            quantity = :quantity,
+                            item_type_id = :item_type_id
+                        WHERE id = :id;
+                        """;
+
+                jdbcTemplate.update(sqlUpdate, Map.of(
+                        "id", id,
+                        "price", item.getPrice(),
+                        "producing_year", item.getProducingYear(),
+                        "manufacturer", item.getManufacturer(),
+                        "quantity", item.getQuantity(),
+                        "item_type_id", item.getItemTypeId()
+                ));
+
+                return;
+            } else {
+                throw new RuntimeException("Item already exists");
+            }
+        }
+
         String sqlAddItem = """
                 INSERT INTO item(title, price, producing_year, manufacturer, quantity, item_type_id)
                 VALUES(:title, :price, :producing_year, :manufacturer, :quantity, :item_type_id);
