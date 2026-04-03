@@ -22,7 +22,8 @@ public class JdbcItemRepository implements ItemRepository {
     public List<Item> getAllItems() {
         String sqlGetAllItems = """
                 SELECT *
-                FROM item;
+                FROM item
+                WHERE is_removed = false;
                 """;
 
         return jdbcTemplate.query(sqlGetAllItems, ROW_MAPPER);
@@ -33,7 +34,7 @@ public class JdbcItemRepository implements ItemRepository {
         String sqlGetItemById = """
                 SELECT *
                 FROM item
-                WHERE id = %s;
+                WHERE id = %s AND is_removed = false;
                 """;
         List<Item> itemList = jdbcTemplate.query(sqlGetItemById.formatted(id), ROW_MAPPER);
         if (itemList.isEmpty()) {
@@ -49,7 +50,7 @@ public class JdbcItemRepository implements ItemRepository {
         String sqlGetItemsByTitle = """
                 SELECT *
                 FROM item
-                WHERE title = :title;
+                WHERE title = :title AND is_removed = false;
                 """;
 
         List<Item> items = jdbcTemplate.query(sqlGetItemsByTitle, Map.of(
@@ -127,7 +128,8 @@ public class JdbcItemRepository implements ItemRepository {
     @Override
     public void deleteItem(int id) {
         String sqlDeleteItem = """
-                DELETE FROM item
+                Update item
+                SET is_removed = true
                 WHERE id = :id          
                 """;
 
