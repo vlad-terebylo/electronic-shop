@@ -1,2 +1,0 @@
-ALTER TABLE item
-    ADD COLUMN is_removed BOOLEAN DEFAULT FALSE;
