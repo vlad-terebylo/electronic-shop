@@ -2,13 +2,12 @@ package com.electronic_shop_tvo.electronicshoptvo.repository.jdbc;
 
 import com.electronic_shop_tvo.electronicshoptvo.exception.ItemNotFoundException;
 import com.electronic_shop_tvo.electronicshoptvo.model.Item;
-import com.electronic_shop_tvo.electronicshoptvo.model.dto.RequestQuantityDto;
 import com.electronic_shop_tvo.electronicshoptvo.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,43 +18,59 @@ public class JdbcItemRepository implements ItemRepository {
     private final NamedParameterJdbcOperations jdbcTemplate;
 
     @Override
-    public List<Item> getAllItems() {
+    public List<Item> getAllItems(boolean isRemoved) {
         String sqlGetAllItems = """
                 SELECT *
                 FROM item
-                WHERE is_removed = false;
+                WHERE is_removed = :isRemoved;
                 """;
 
-        return jdbcTemplate.query(sqlGetAllItems, ROW_MAPPER);
+        return jdbcTemplate.query(
+                sqlGetAllItems,
+                Map.of(
+                        "is_removed", isRemoved
+                ),
+                ROW_MAPPER);
     }
 
     @Override
-    public Item getItemById(int id) {
+    public Item getItemById(int id, boolean isRemoved) {
         String sqlGetItemById = """
                 SELECT *
                 FROM item
-                WHERE id = %s AND is_removed = false;
+                WHERE id = :id AND is_removed = :isRemoved;
                 """;
-        List<Item> itemList = jdbcTemplate.query(sqlGetItemById.formatted(id), ROW_MAPPER);
-        if (itemList.isEmpty()) {
-            throw new ItemNotFoundException("This list is empty");
-        }
 
-        return itemList.get(0);
+        try {
+            return jdbcTemplate.queryForObject(
+                    sqlGetItemById,
+                    Map.of(
+                            "id", id,
+                            "isRemoved", isRemoved
+                    ),
+                    ROW_MAPPER
+            );
+        } catch (EmptyResultDataAccessException e) {
+            throw new ItemNotFoundException("Item not found, id=" + id);
+        }
     }
 
 
     @Override
-    public List<Item> getItemsByTitle(String title) {
+    public List<Item> getItemsByTitle(String title, boolean isRemoved) {
         String sqlGetItemsByTitle = """
                 SELECT *
                 FROM item
-                WHERE title = :title AND is_removed = false;
+                WHERE title = :title AND is_removed = :isRemoved;
                 """;
 
-        List<Item> items = jdbcTemplate.query(sqlGetItemsByTitle, Map.of(
-                "title", title
-        ), ROW_MAPPER);
+        List<Item> items = jdbcTemplate.query(
+                sqlGetItemsByTitle,
+                Map.of(
+                        "title", title,
+                        "isRemoved", isRemoved
+                ),
+                ROW_MAPPER);
 
         if (items.isEmpty()) {
             throw new ItemNotFoundException("This list is empty");
@@ -66,122 +81,91 @@ public class JdbcItemRepository implements ItemRepository {
 
     @Override
     public void addNewItem(Item item) {
-
-        String sqlFind = """
-                SELECT id, is_removed
-                FROM item
-                WHERE title = :title AND item_type_id = :item_type_id
-                LIMIT 1;
+        String sqlAddItem = """
+                INSERT INTO item(title, price, producing_year, manufacturer, quantity, item_type_id)
+                VALUES(:title, :price, :producing_year, :manufacturer, :quantity, :item_type_id)
                 """;
 
-        List<Map<String, Object>> existingItems = jdbcTemplate.queryForList(sqlFind, Map.of(
-                "title", item.getTitle(),
-                "item_type_id", item.getItemTypeId()
-        ));
-
-        if (!existingItems.isEmpty()) {
-            Map<String, Object> existing = existingItems.get(0);
-
-            Long id = ((Number) existing.get("id")).longValue();
-            Boolean isRemoved = (Boolean) existing.get("is_removed");
-
-            if (Boolean.TRUE.equals(isRemoved)) {
-                String sqlUpdate = """
-                        UPDATE item
-                        SET 
-                            is_removed = false,
-                            price = :price,
-                            producing_year = :producing_year,
-                            manufacturer = :manufacturer,
-                            quantity = :quantity,
-                            item_type_id = :item_type_id
-                        WHERE id = :id;
-                        """;
-
-                jdbcTemplate.update(sqlUpdate, Map.of(
-                        "id", id,
+        jdbcTemplate.update(
+                sqlAddItem,
+                Map.of(
+                        "title", item.getTitle(),
                         "price", item.getPrice(),
                         "producing_year", item.getProducingYear(),
                         "manufacturer", item.getManufacturer(),
                         "quantity", item.getQuantity(),
                         "item_type_id", item.getItemTypeId()
                 ));
-
-                return;
-            } else {
-                throw new RuntimeException("Item already exists");
-            }
-        }
-
-        String sqlAddItem = """
-                INSERT INTO item(title, price, producing_year, manufacturer, quantity, item_type_id)
-                VALUES(:title, :price, :producing_year, :manufacturer, :quantity, :item_type_id);
-                """;
-
-        jdbcTemplate.update(sqlAddItem, Map.of(
-                "title", item.getTitle(),
-                "price", item.getPrice(),
-                "producing_year", item.getProducingYear(),
-                "manufacturer", item.getManufacturer(),
-                "quantity", item.getQuantity(),
-                "item_type_id", item.getItemTypeId()
-        ));
     }
 
     @Override
-    public void updateItem(int id, Item item) {
+    public void updateItem(int id, Item item, boolean isRemoved) {
         String sqlUpdateItem = """
                 UPDATE item
                 SET title = :title, price = :price, producing_year = :producing_year, manufacturer = :manufacturer, quantity = :quantity, item_type_id = :item_type_id
-                WHERE id = :id;
+                WHERE id = :id AND is_removed = :isRemoved;
                 """;
 
-        jdbcTemplate.update(sqlUpdateItem, Map.of(
-                "id", id,
-                "title", item.getTitle(),
-                "price", item.getPrice(),
-                "producing_year", item.getProducingYear(),
-                "manufacturer", item.getManufacturer(),
-                "quantity", item.getQuantity(),
-                "item_type_id", item.getItemTypeId()
-        ));
+        jdbcTemplate.update(
+                sqlUpdateItem,
+                Map.of(
+                        "id", id,
+                        "title", item.getTitle(),
+                        "price", item.getPrice(),
+                        "producing_year", item.getProducingYear(),
+                        "manufacturer", item.getManufacturer(),
+                        "quantity", item.getQuantity(),
+                        "item_type_id", item.getItemTypeId(),
+                        "isRemoved", isRemoved
+                ));
     }
 
     @Override
-    public Integer getQuantity(int id, Integer quantity) {
+    public Integer getQuantity(int id, boolean isRemoved) {
         String sqlGetQuantity = """
                 SELECT quantity
                 FROM item
-                WHERE id = %s;
+                WHERE id = :id AND is_removed = :isRemoved
                 """;
 
-        return jdbcTemplate.queryForObject(sqlGetQuantity.formatted(id), new HashMap<>(), Integer.class);
+        return jdbcTemplate.queryForObject(
+                sqlGetQuantity,
+                Map.of(
+                        "id", id,
+                        "isRemoved", isRemoved
+                ),
+                Integer.class);
     }
 
     @Override
-    public void updateQuantity(int id, Integer newQuantity) {
+    public void updateQuantity(int id, Integer newQuantity, boolean isRemoved) {
         String sqlUpdateQuantity = """
                 UPDATE item
                 SET quantity = :quantity
-                WHERE id = :id
+                WHERE id = :id AND is_removed = :isRemoved
                 """;
 
-        jdbcTemplate.update(sqlUpdateQuantity, Map.of(
-                "id", id,
-                "quantity", newQuantity
-        ));
+        jdbcTemplate.update(
+                sqlUpdateQuantity,
+                Map.of(
+                        "id", id,
+                        "quantity", newQuantity,
+                        "isRemoved", isRemoved
+                ));
     }
 
     @Override
     public void deleteItem(int id) {
         String sqlDeleteItem = """
-                Update item
+                UPDATE item
                 SET is_removed = true
-                WHERE id = :id          
+                WHERE id = :id
                 """;
 
-        jdbcTemplate.update(sqlDeleteItem, Map.of(
-                "id", id
-        ));
+        jdbcTemplate.update(
+                sqlDeleteItem,
+                Map.of(
+                        "id", id
+                ));
     }
 }

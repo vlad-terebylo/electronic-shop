@@ -8,7 +8,7 @@ public interface ItemTypeRepository {
 
     List<ItemType> getAllItemTypes();
 
-    ItemType getItemTypeByItemId(int id);
+    ItemType getItemTypeById(int id);
 
     void addItemType(ItemType itemType);
 

@@ -5,6 +5,7 @@ import com.electronic_shop_tvo.electronicshoptvo.exception.ItemTypeNotFoundExcep
 import com.electronic_shop_tvo.electronicshoptvo.model.ItemType;
 import com.electronic_shop_tvo.electronicshoptvo.repository.ItemTypeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
@@ -27,19 +28,22 @@ public class JdbcItemTypeRepository implements ItemTypeRepository {
     }
 
     @Override
-    public ItemType getItemTypeByItemId(int id) {
+    public ItemType getItemTypeById(int id) {
         String sqlGetItemTypeById = """
                 SELECT *
                 FROM item_type
-                WHERE id = %s
+                WHERE id = :id
                 """;
 
-        List<ItemType> itemTypeList = jdbcTemplate.query(sqlGetItemTypeById.formatted(id), ROW_MAPPER);
-        if (itemTypeList.isEmpty()) {
-            throw new ItemTypeNotFoundException("This list is empty");
+        try {
+            return jdbcTemplate.queryForObject(
+                    sqlGetItemTypeById,
+                    Map.of("id", id),
+                    ROW_MAPPER
+            );
+        } catch (EmptyResultDataAccessException e) {
+            throw new ItemNotFoundException("Item type not found, id=" + id);
         }
-
-        return itemTypeList.get(0);
     }
 
     @Override
