@@ -1,3 +1,4 @@
+![Electronic Shop Projecting](https://github.com/user-attachments/assets/835d2397-9007-431e-8cf8-f2d7543ce497)
 Electronic-Shop
 
 Electronic-Shop is a Spring Boot application that implements a simple electronic products store backend.
@@ -10,6 +11,7 @@ Key Features:
   3) Quantity Adjustment: Special endpoints to add or remove quantity of an existing item, with validation (throws exceptions if resulting quantity is negative).
   4) Database Migrations: Built-in Flyway migrations to set up database schema automatically.
   5) Testing: Includes unit tests and integration tests for service layers, ensuring business logic correctness.
+  6) Authorization: there are 3 roles - unauthorized user, authorized and admin
      
 Technology Stack:
   1) Java
@@ -19,4 +21,5 @@ Technology Stack:
   5) Database Migrations Flyway
   6) Maven
   7) Git
-  8) Other Libraries: Lombok (for getters/setters), Spring Boot Starter Web for REST API, Spring Boot Starter JDBC for data access, JUnit/Spring Test for testing.
+  8) Microsoft Azure Entra ID as Identity provider
+  9) Other Libraries: Lombok (for getters/setters), Spring Boot Starter Web for REST API, Spring Boot Starter JDBC for data access, JUnit/Spring Test for testing.
