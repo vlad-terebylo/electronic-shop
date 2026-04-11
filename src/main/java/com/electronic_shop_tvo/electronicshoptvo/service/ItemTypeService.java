@@ -1,5 +1,6 @@
 package com.electronic_shop_tvo.electronicshoptvo.service;
 
+import com.electronic_shop_tvo.electronicshoptvo.exception.ItemTypeNotFoundException;
 import com.electronic_shop_tvo.electronicshoptvo.model.ItemType;
 import com.electronic_shop_tvo.electronicshoptvo.repository.ItemTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +35,9 @@ public class ItemTypeService {
 
     public void updateItemType(int id, ItemType itemType) {
         ItemType oldItemType = itemTypeRepository.getItemTypeById(id);
+
         if (isNull(oldItemType)) {
-            throw new NullPointerException("Item type is null");
+            throw new ItemTypeNotFoundException("Item type is null");
         }
 
         this.itemTypeRepository.updateItemType(id, itemType);

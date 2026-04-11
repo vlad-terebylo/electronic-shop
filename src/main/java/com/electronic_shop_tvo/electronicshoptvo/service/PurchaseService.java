@@ -1,5 +1,6 @@
 package com.electronic_shop_tvo.electronicshoptvo.service;
 
+import com.electronic_shop_tvo.electronicshoptvo.exception.QuantityIsUnderZeroException;
 import com.electronic_shop_tvo.electronicshoptvo.model.Item;
 import com.electronic_shop_tvo.electronicshoptvo.model.Purchase;
 import com.electronic_shop_tvo.electronicshoptvo.model.PurchaseItem;
@@ -42,8 +43,13 @@ public class PurchaseService {
 
             BigDecimal itemTotal = price.multiply(BigDecimal.valueOf(quantity));
             totalPrice = totalPrice.add(itemTotal);
+            int newQuantity = item.getQuantity() - quantity;
 
-            itemRepository.updateQuantity(id, item.getQuantity() - quantity, false);
+            if(newQuantity < 0){
+                throw new QuantityIsUnderZeroException("The quantity must be more than zero");
+            }
+
+            itemRepository.updateQuantity(id, newQuantity, false);
         }
 
         purchase.setTotalPrice(totalPrice);

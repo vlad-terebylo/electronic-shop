@@ -56,14 +56,14 @@ public class ItemService {
             throw new QuantityIsNotValidException("The quantity must not be null!");
         }
 
-        if (!isPositive(quantity)) {
+        if (isNegative(quantity)) {
             throw new QuantityIsUnderZeroException("The quantity must be more than zero!");
         }
 
-        Integer currentQuantity = this.itemRepository.getQuantity(id, false);
-        currentQuantity += quantity;
+        int currentQuantity = this.itemRepository.getQuantity(id, false);
+        int newQuantity = currentQuantity + quantity;
 
-        this.itemRepository.updateQuantity(id, currentQuantity, false);
+        this.itemRepository.updateQuantity(id, newQuantity, false);
     }
 
     public void removeQuantity(int id, Integer quantity) {
@@ -71,22 +71,22 @@ public class ItemService {
             throw new QuantityIsNotValidException("The quantity must not be null!");
         }
 
-        if (!isPositive(quantity)) {
+        if (isNegative(quantity)) {
             throw new QuantityIsUnderZeroException("The quantity must be more than zero!");
         }
 
-        Integer currentQuantity = this.itemRepository.getQuantity(id, false);
-        if (!isPositive(currentQuantity)) {
+        int currentQuantity = this.itemRepository.getQuantity(id, false);
+
+        int newQuantity = currentQuantity - quantity;
+        if (isNegative(newQuantity)) {
             throw new QuantityIsUnderZeroException("The quantity is under zero");
         }
 
-        currentQuantity -= quantity;
-
-        this.itemRepository.updateQuantity(id, currentQuantity, false);
+        this.itemRepository.updateQuantity(id, newQuantity, false);
     }
 
-    private boolean isPositive(int quantity) {
-        return quantity > 0;
+    private boolean isNegative(int quantity) {
+        return quantity <= 0;
     }
 
     public void deleteItem(int id) {
