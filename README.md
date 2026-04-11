@@ -12,6 +12,7 @@ Key Features:
   4) Database Migrations: Built-in Flyway migrations to set up database schema automatically.
   5) Testing: Includes unit tests and integration tests for service layers, ensuring business logic correctness.
   6) Authorization: there are 3 roles - unauthorized user, authorized and admin
+  7) Projecting through Excalidraw
      
 Technology Stack:
   1) Java
