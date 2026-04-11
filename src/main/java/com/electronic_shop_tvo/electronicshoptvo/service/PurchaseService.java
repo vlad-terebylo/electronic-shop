@@ -36,14 +36,14 @@ public class PurchaseService {
 
         for (PurchaseItem purchaseItem : purchase.getPurchaseItems()) {
             int id = purchaseItem.getItemId();
-            Item item = itemRepository.getItemById(id);
+            Item item = itemRepository.getItemById(id, false);
             BigDecimal price = item.getPrice();
             int quantity = purchaseItem.getQuantity();
 
             BigDecimal itemTotal = price.multiply(BigDecimal.valueOf(quantity));
             totalPrice = totalPrice.add(itemTotal);
 
-            itemRepository.updateQuantity(id, item.getQuantity() - quantity);
+            itemRepository.updateQuantity(id, item.getQuantity() - quantity, false);
         }
 
         purchase.setTotalPrice(totalPrice);

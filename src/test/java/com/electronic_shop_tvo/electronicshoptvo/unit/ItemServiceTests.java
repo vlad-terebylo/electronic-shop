@@ -34,7 +34,7 @@ public class ItemServiceTests {
                 LocalDateTime.of(2024, 1, 1, 0, 0),
                 "Apple", 50, 2));
 
-        when(itemRepository.getAllItems()).thenReturn(expectedList);
+        when(itemRepository.getAllItems(false)).thenReturn(expectedList);
 
         List<Item> result = itemService.getAllItems();
 
@@ -48,7 +48,7 @@ public class ItemServiceTests {
                 LocalDateTime.of(2024, 1, 1, 0, 0),
                 "Apple", 50, 2);
 
-        when(itemRepository.getItemById(id)).thenReturn(expectedItem);
+        when(itemRepository.getItemById(id, false)).thenReturn(expectedItem);
 
         Item result = itemService.getItemById(id);
 
@@ -63,7 +63,7 @@ public class ItemServiceTests {
                 LocalDateTime.of(2024, 1, 1, 0, 0),
                 "Apple", 50, 2));
 
-        when(itemRepository.getItemsByTitle(title)).thenReturn(expectedItems);
+        when(itemRepository.getItemsByTitle(title, false)).thenReturn(expectedItems);
 
         List<Item> result = itemService.getItemsByTitle(title);
 
@@ -92,7 +92,7 @@ public class ItemServiceTests {
 
         itemService.updateItem(id, item);
 
-        verify(itemRepository, times(1)).updateItem(id, item);
+        verify(itemRepository, times(1)).updateItem(id, item, false);
     }
 
     @Test

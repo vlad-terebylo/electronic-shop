@@ -22,15 +22,15 @@ public class ItemService {
     }
 
     public List<Item> getAllItems() {
-        return this.itemRepository.getAllItems();
+        return this.itemRepository.getAllItems(false);
     }
 
     public Item getItemById(int id) {
-        return this.itemRepository.getItemById(id);
+        return this.itemRepository.getItemById(id, false);
     }
 
     public List<Item> getItemsByTitle(String title) {
-        return this.itemRepository.getItemsByTitle(title);
+        return this.itemRepository.getItemsByTitle(title, false);
     }
 
     public void addNewItem(Item item) {
@@ -38,7 +38,7 @@ public class ItemService {
     }
 
     public void updateItem(int id, Item item) {
-        Item oldItem = this.itemRepository.getItemById(id);
+        Item oldItem = this.itemRepository.getItemById(id, false);
 
         if (isNull(oldItem)) {
             throw new NullPointerException("This item does not exist");
@@ -47,7 +47,7 @@ public class ItemService {
         item.setManufacturer(oldItem.getManufacturer());
         item.setProducingYear(oldItem.getProducingYear());
 
-        this.itemRepository.updateItem(id, item);
+        this.itemRepository.updateItem(id, item, false);
     }
 
     public void addQuantity(int id, Integer quantity) {
@@ -59,10 +59,10 @@ public class ItemService {
             throw new QuantityIsUnderZeroException("The quantity must be more than zero!");
         }
 
-        Integer currentQuantity = this.itemRepository.getQuantity(id);
+        Integer currentQuantity = this.itemRepository.getQuantity(id, false);
         currentQuantity += quantity;
 
-        this.itemRepository.updateQuantity(id, currentQuantity);
+        this.itemRepository.updateQuantity(id, currentQuantity, false);
     }
 
     public void removeQuantity(int id, Integer quantity) {
@@ -74,14 +74,14 @@ public class ItemService {
             throw new QuantityIsUnderZeroException("The quantity must be more than zero!");
         }
 
-        Integer currentQuantity = this.itemRepository.getQuantity(id);
+        Integer currentQuantity = this.itemRepository.getQuantity(id, false);
         if (!isPositive(currentQuantity)) {
             throw new QuantityIsUnderZeroException("The quantity is under zero");
         }
 
         currentQuantity -= quantity;
 
-        this.itemRepository.updateQuantity(id, currentQuantity);
+        this.itemRepository.updateQuantity(id, currentQuantity, false);
     }
 
     private boolean isPositive(int quantity) {
