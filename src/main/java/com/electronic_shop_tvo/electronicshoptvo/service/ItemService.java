@@ -3,7 +3,6 @@ package com.electronic_shop_tvo.electronicshoptvo.service;
 import com.electronic_shop_tvo.electronicshoptvo.exception.QuantityIsNotValidException;
 import com.electronic_shop_tvo.electronicshoptvo.exception.QuantityIsUnderZeroException;
 import com.electronic_shop_tvo.electronicshoptvo.model.Item;
-import com.electronic_shop_tvo.electronicshoptvo.model.dto.RequestQuantityDto;
 import com.electronic_shop_tvo.electronicshoptvo.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,6 +40,10 @@ public class ItemService {
     public void updateItem(int id, Item item) {
         Item oldItem = this.itemRepository.getItemById(id);
 
+        if (isNull(oldItem)) {
+            throw new NullPointerException("This item does not exist");
+        }
+
         item.setManufacturer(oldItem.getManufacturer());
         item.setProducingYear(oldItem.getProducingYear());
 
@@ -52,11 +55,11 @@ public class ItemService {
             throw new QuantityIsNotValidException("The quantity must not be null!");
         }
 
-        if (!isValid(quantity)) {
+        if (!isPositive(quantity)) {
             throw new QuantityIsUnderZeroException("The quantity must be more than zero!");
         }
 
-        Integer currentQuantity = this.itemRepository.getQuantity(id, quantity);
+        Integer currentQuantity = this.itemRepository.getQuantity(id);
         currentQuantity += quantity;
 
         this.itemRepository.updateQuantity(id, currentQuantity);
@@ -67,21 +70,21 @@ public class ItemService {
             throw new QuantityIsNotValidException("The quantity must not be null!");
         }
 
-        if (!isValid(quantity)) {
+        if (!isPositive(quantity)) {
             throw new QuantityIsUnderZeroException("The quantity must be more than zero!");
         }
 
-        Integer currentQuantity = this.itemRepository.getQuantity(id, quantity);
-        currentQuantity -= quantity;
-
-        if (!isValid(currentQuantity)) {
+        Integer currentQuantity = this.itemRepository.getQuantity(id);
+        if (!isPositive(currentQuantity)) {
             throw new QuantityIsUnderZeroException("The quantity is under zero");
         }
+
+        currentQuantity -= quantity;
 
         this.itemRepository.updateQuantity(id, currentQuantity);
     }
 
-    private boolean isValid(int quantity) {
+    private boolean isPositive(int quantity) {
         return quantity > 0;
     }
 

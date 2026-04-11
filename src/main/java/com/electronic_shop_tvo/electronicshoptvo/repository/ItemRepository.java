@@ -1,7 +1,6 @@
 package com.electronic_shop_tvo.electronicshoptvo.repository;
 
 import com.electronic_shop_tvo.electronicshoptvo.model.Item;
-import com.electronic_shop_tvo.electronicshoptvo.model.dto.RequestQuantityDto;
 
 import java.util.List;
 
@@ -16,7 +15,7 @@ public interface ItemRepository {
 
     void updateItem(int id, Item item);
 
-    Integer getQuantity(int id, Integer quantity);
+    Integer getQuantity(int id);
 
     void updateQuantity(int id, Integer newQuantity);
 

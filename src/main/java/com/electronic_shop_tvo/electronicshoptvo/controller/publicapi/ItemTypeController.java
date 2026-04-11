@@ -31,6 +31,6 @@ public class ItemTypeController {
     public ItemTypeDto getItemTypeById(@PathVariable int id) {
         log.info("Getting item type by id: {}", id);
 
-        return new ItemTypeDto(itemTypeService.getItemTypeByItemId(id));
+        return new ItemTypeDto(itemTypeService.getItemTypeById(id));
     }
 }

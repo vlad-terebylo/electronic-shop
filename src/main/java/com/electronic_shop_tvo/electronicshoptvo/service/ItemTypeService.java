@@ -5,6 +5,9 @@ import com.electronic_shop_tvo.electronicshoptvo.repository.ItemTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static java.util.Objects.isNull;
+
+
 import java.util.List;
 
 @Service
@@ -21,8 +24,8 @@ public class ItemTypeService {
         return this.itemTypeRepository.getAllItemTypes();
     }
 
-    public ItemType getItemTypeByItemId(int id) {
-        return this.itemTypeRepository.getItemTypeByItemId(id);
+    public ItemType getItemTypeById(int id) {
+        return this.itemTypeRepository.getItemTypeById(id);
     }
 
     public void addItemType(ItemType itemType) {
@@ -30,6 +33,11 @@ public class ItemTypeService {
     }
 
     public void updateItemType(int id, ItemType itemType) {
+        ItemType oldItemType = itemTypeRepository.getItemTypeById(id);
+        if (isNull(oldItemType)) {
+            throw new NullPointerException("Item type is null");
+        }
+
         this.itemTypeRepository.updateItemType(id, itemType);
     }
 

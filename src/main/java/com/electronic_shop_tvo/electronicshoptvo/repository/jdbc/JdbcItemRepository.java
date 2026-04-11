@@ -2,9 +2,9 @@ package com.electronic_shop_tvo.electronicshoptvo.repository.jdbc;
 
 import com.electronic_shop_tvo.electronicshoptvo.exception.ItemNotFoundException;
 import com.electronic_shop_tvo.electronicshoptvo.model.Item;
-import com.electronic_shop_tvo.electronicshoptvo.model.dto.RequestQuantityDto;
 import com.electronic_shop_tvo.electronicshoptvo.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 
@@ -34,14 +34,17 @@ public class JdbcItemRepository implements ItemRepository {
         String sqlGetItemById = """
                 SELECT *
                 FROM item
-                WHERE id = %s AND is_removed = false;
+                WHERE id = :id AND is_removed = false;
                 """;
-        List<Item> itemList = jdbcTemplate.query(sqlGetItemById.formatted(id), ROW_MAPPER);
-        if (itemList.isEmpty()) {
-            throw new ItemNotFoundException("This list is empty");
+        try {
+            return jdbcTemplate.queryForObject(
+                    sqlGetItemById,
+                    Map.of("id", id),
+                    ROW_MAPPER
+            );
+        } catch (EmptyResultDataAccessException e) {
+            throw new ItemNotFoundException("Item not found, id=" + id);
         }
-
-        return itemList.get(0);
     }
 
 
@@ -67,14 +70,20 @@ public class JdbcItemRepository implements ItemRepository {
     @Override
     public void addNewItem(Item item) {
 
-        String sqlFind = """
+        /*
+        * 1) Добавить элемент если его нету
+        * 2) Добавить элемент, который есть в БД, но с флагом is_removed = true
+        * 3) Добавить элемент, который есть в БД, но с флагом is_removed = false
+        * */
+
+        String sqlFindItem = """
                 SELECT id, is_removed
                 FROM item
                 WHERE title = :title AND item_type_id = :item_type_id
                 LIMIT 1;
                 """;
 
-        List<Map<String, Object>> existingItems = jdbcTemplate.queryForList(sqlFind, Map.of(
+        List<Map<String, Object>> existingItems = jdbcTemplate.queryForList(sqlFindItem, Map.of(
                 "title", item.getTitle(),
                 "item_type_id", item.getItemTypeId()
         ));
@@ -82,8 +91,8 @@ public class JdbcItemRepository implements ItemRepository {
         if (!existingItems.isEmpty()) {
             Map<String, Object> existing = existingItems.get(0);
 
-            Long id = ((Number) existing.get("id")).longValue();
-            Boolean isRemoved = (Boolean) existing.get("is_removed");
+            long id = ((Number) existing.get("id")).longValue();
+            boolean isRemoved = (Boolean) existing.get("is_removed");
 
             if (Boolean.TRUE.equals(isRemoved)) {
                 String sqlUpdate = """
@@ -133,7 +142,7 @@ public class JdbcItemRepository implements ItemRepository {
         String sqlUpdateItem = """
                 UPDATE item
                 SET title = :title, price = :price, producing_year = :producing_year, manufacturer = :manufacturer, quantity = :quantity, item_type_id = :item_type_id
-                WHERE id = :id;
+                WHERE id = :id AND is_removed = false;
                 """;
 
         jdbcTemplate.update(sqlUpdateItem, Map.of(
@@ -148,14 +157,17 @@ public class JdbcItemRepository implements ItemRepository {
     }
 
     @Override
-    public Integer getQuantity(int id, Integer quantity) {
+    public Integer getQuantity(int id) {
         String sqlGetQuantity = """
                 SELECT quantity
                 FROM item
-                WHERE id = %s;
+                WHERE id = :id AND is_removed = false
                 """;
 
-        return jdbcTemplate.queryForObject(sqlGetQuantity.formatted(id), new HashMap<>(), Integer.class);
+        return jdbcTemplate.queryForObject(
+                sqlGetQuantity,
+                Map.of("id", id),
+                Integer.class);
     }
 
     @Override
@@ -163,7 +175,7 @@ public class JdbcItemRepository implements ItemRepository {
         String sqlUpdateQuantity = """
                 UPDATE item
                 SET quantity = :quantity
-                WHERE id = :id
+                WHERE id = :id AND is_removed = false
                 """;
 
         jdbcTemplate.update(sqlUpdateQuantity, Map.of(
@@ -175,9 +187,9 @@ public class JdbcItemRepository implements ItemRepository {
     @Override
     public void deleteItem(int id) {
         String sqlDeleteItem = """
-                Update item
+                UPDATE item
                 SET is_removed = true
-                WHERE id = :id          
+                WHERE id = :id
                 """;
 
         jdbcTemplate.update(sqlDeleteItem, Map.of(
