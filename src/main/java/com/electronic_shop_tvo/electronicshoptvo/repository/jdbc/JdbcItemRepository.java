@@ -40,6 +40,7 @@ public class JdbcItemRepository implements ItemRepository {
                 FROM item
                 WHERE id = :id AND is_removed = :isRemoved;
                 """;
+
         try {
             return jdbcTemplate.queryForObject(
                     sqlGetItemById,

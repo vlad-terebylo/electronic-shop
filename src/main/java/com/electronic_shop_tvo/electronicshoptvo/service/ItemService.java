@@ -1,5 +1,6 @@
 package com.electronic_shop_tvo.electronicshoptvo.service;
 
+import com.electronic_shop_tvo.electronicshoptvo.exception.ItemNotFoundException;
 import com.electronic_shop_tvo.electronicshoptvo.exception.QuantityIsNotValidException;
 import com.electronic_shop_tvo.electronicshoptvo.exception.QuantityIsUnderZeroException;
 import com.electronic_shop_tvo.electronicshoptvo.model.Item;
@@ -41,7 +42,7 @@ public class ItemService {
         Item oldItem = this.itemRepository.getItemById(id, false);
 
         if (isNull(oldItem)) {
-            throw new NullPointerException("This item does not exist");
+            throw new ItemNotFoundException("This item does not exist");
         }
 
         item.setManufacturer(oldItem.getManufacturer());
