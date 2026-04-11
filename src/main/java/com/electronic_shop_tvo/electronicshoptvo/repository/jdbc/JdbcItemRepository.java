@@ -69,13 +69,6 @@ public class JdbcItemRepository implements ItemRepository {
 
     @Override
     public void addNewItem(Item item) {
-
-        /*
-        * 1) Добавить элемент если его нету
-        * 2) Добавить элемент, который есть в БД, но с флагом is_removed = true
-        * 3) Добавить элемент, который есть в БД, но с флагом is_removed = false
-        * */
-
         String sqlFindItem = """
                 SELECT id, is_removed
                 FROM item
