@@ -13,6 +13,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -80,10 +81,14 @@ public class PurchaseServiceTest extends BaseTest {
                 "terebilo.vlad1409@gmail.com",
                 "675831-1-4567889",
                 List.of(purchaseItem),
-                item.getPrice().multiply(BigDecimal.valueOf(purchaseItem.getQuantity())));
+                BigDecimal.valueOf(5000));
+
         itemTestRepository.addNewItem(item);
         purchaseService.addNewPurchase(purchase);
 
+        System.out.println(purchase);
+        System.out.println(purchase.equals(purchaseTestRepository.getAllPurchases().stream().findFirst().orElseThrow()));
+        System.out.println(purchaseTestRepository.getAllPurchases());
         assertTrue(purchaseTestRepository.getAllPurchases().contains(purchase));
     }
 }

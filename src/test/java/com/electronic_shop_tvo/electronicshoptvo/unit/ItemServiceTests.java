@@ -90,6 +90,8 @@ public class ItemServiceTests {
                 "Apple", 50, 2);
         int id = 1;
 
+        when(itemService.getItemById(id)).thenReturn(item);
+
         itemService.updateItem(id, item);
 
         verify(itemRepository, times(1)).updateItem(id, item, false);

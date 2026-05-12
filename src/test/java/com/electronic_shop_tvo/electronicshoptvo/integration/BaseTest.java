@@ -6,28 +6,27 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.MySQLContainer;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Import(TestPostgresConfig.class)
+@Import({TestPostgresConfig.class})
 abstract class BaseTest {
 
-    private static PostgreSQLContainer<?> postgreSQL = new PostgreSQLContainer("postgres:13")
+    private static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:8.0")
             .withDatabaseName("test")
             .withUsername("test")
             .withPassword("test");
 
     static {
-        postgreSQL.start();
+        mySQLContainer.start();
     }
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
-        String host = postgreSQL.getHost();
-        int port = postgreSQL.getFirstMappedPort();
-        registry.add("spring.datasource.url", postgreSQL::getJdbcUrl);
-        System.out.println(postgreSQL.getJdbcUrl());
+        registry.add("spring.datasource.url", mySQLContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", mySQLContainer::getUsername);
+        registry.add("spring.datasource.password", mySQLContainer::getPassword);
     }
 
 }

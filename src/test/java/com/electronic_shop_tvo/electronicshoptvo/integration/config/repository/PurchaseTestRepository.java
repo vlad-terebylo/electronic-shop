@@ -5,7 +5,10 @@ import com.electronic_shop_tvo.electronicshoptvo.model.Purchase;
 import com.electronic_shop_tvo.electronicshoptvo.model.PurchaseItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
 import java.util.List;
 import java.util.Map;
@@ -19,15 +22,15 @@ public class PurchaseTestRepository {
 
     public List<Purchase> getAllPurchases() {
         String sqlPurchases = """
-            SELECT *
-            FROM customer_purchase
-            """;
+                SELECT *
+                FROM customer_purchase
+                """;
 
         String sqlPurchaseItems = """
-            SELECT item_id, quantity
-            FROM purchase_item
-            WHERE purchase_id = :id
-            """;
+                SELECT item_id, quantity
+                FROM purchase_item
+                WHERE purchase_id = :id
+                """;
 
         List<Purchase> purchases = jdbcTemplate.query(sqlPurchases, ROW_MAPPER);
 
@@ -55,10 +58,10 @@ public class PurchaseTestRepository {
     public Purchase getPurchaseById(int id) {
 
         String sqlGetPurchase = """
-            SELECT *
-            FROM customer_purchase
-            WHERE id = :id
-            """;
+                SELECT *
+                FROM customer_purchase
+                WHERE id = :id
+                """;
 
         String sqlGetPurchaseItems = """
                 SELECT item_id, quantity
@@ -100,7 +103,6 @@ public class PurchaseTestRepository {
         String sqlAddCustomerInfo = """
                 INSERT INTO customer_purchase(email, card_number, total_price)
                 VALUES(:email, :cardNumber, :totalPrice)
-                RETURNING id
                 """;
 
         String sqlAddPurchaseItem = """
@@ -108,11 +110,20 @@ public class PurchaseTestRepository {
                 VALUES(:purchase_id, :item_id, :quantity)
                 """;
 
-        int id = jdbcTemplate.queryForObject(sqlAddCustomerInfo, Map.of(
-                "email", purchase.getEmail(),
-                "cardNumber", purchase.getCardNumber(),
-                "totalPrice", purchase.getTotalPrice()
-        ), Integer.class);
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        MapSqlParameterSource customerParams = new MapSqlParameterSource()
+                .addValue("email", purchase.getEmail())
+                .addValue("cardNumber", purchase.getCardNumber())
+                .addValue("totalPrice", purchase.getTotalPrice());
+
+        jdbcTemplate.update(sqlAddCustomerInfo, customerParams, keyHolder);
+
+        Number generatedId = keyHolder.getKey();
+        if (generatedId == null) {
+            throw new RuntimeException("Failed to retrieve generated ID for purchase");
+        }
+        int id = generatedId.intValue();
 
         List<PurchaseItem> purchaseItems = purchase.getPurchaseItems();
 
@@ -137,11 +148,11 @@ public class PurchaseTestRepository {
                 """;
 
         String sqlRestartCustomerPurchaseId = """
-                ALTER SEQUENCE customer_purchase_id_seq RESTART WITH 1;
+                ALTER TABLE customer_purchase AUTO_INCREMENT = 1;
                 """;
 
         String sqlRestartPurchaseItemId = """
-                ALTER SEQUENCE purchase_item_id_seq RESTART WITH 1;
+                ALTER TABLE purchase_item AUTO_INCREMENT = 1;
                 """;
 
 

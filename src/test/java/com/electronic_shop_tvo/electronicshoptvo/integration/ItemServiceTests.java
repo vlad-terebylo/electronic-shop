@@ -37,7 +37,7 @@ public class ItemServiceTests extends BaseTest {
     @Test
     void should_return_all_items() {
         List<Item> result = itemService.getAllItems();
-        assertEquals(itemRepository.getAllItems(), result);
+        assertEquals(itemRepository.getAllItems(false), result);
     }
 
     @Test
@@ -51,7 +51,7 @@ public class ItemServiceTests extends BaseTest {
         itemService.addNewItem(item);
         Item result = itemService.getItemById(id);
 
-        assertEquals(itemRepository.getItemById(id), result);
+        assertEquals(itemRepository.getItemById(id, false), result);
     }
 
     @Test
@@ -66,7 +66,7 @@ public class ItemServiceTests extends BaseTest {
 
         List<Item> result = itemService.getItemsByTitle(title);
 
-        assertEquals(itemRepository.getItemsByTitle(title), result);
+        assertEquals(itemRepository.getItemsByTitle(title, false), result);
     }
 
     @Test
@@ -77,7 +77,16 @@ public class ItemServiceTests extends BaseTest {
 
         itemService.addNewItem(item);
 
-        assertTrue(itemRepository.getAllItems().contains(item));
+        List<Item> allItems = itemRepository.getAllItems(false);
+
+        Item foundItem = allItems.stream()
+                .filter(i -> i.getTitle().equals("MacBook Pro"))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Item not found in DB"));
+
+        assertEquals(item.getManufacturer(), foundItem.getManufacturer());
+        assertEquals(item.getQuantity(), foundItem.getQuantity());
+        assertEquals(0, item.getPrice().compareTo(foundItem.getPrice()));
     }
 
     @Test
@@ -89,7 +98,7 @@ public class ItemServiceTests extends BaseTest {
 
         itemService.addNewItem(item);
 
-        BigDecimal newPrice = BigDecimal.valueOf(1500);
+        BigDecimal newPrice = BigDecimal.valueOf(1500.0);
         int newQuantity = 70;
         item.setPrice(newPrice);
         item.setQuantity(newQuantity);
@@ -98,7 +107,7 @@ public class ItemServiceTests extends BaseTest {
 
         Item gotItem = itemService.getItemById(id);
 
-        assertEquals(item.getPrice(), gotItem.getPrice());
+        assertEquals(0, item.getPrice().compareTo(gotItem.getPrice()));
         assertEquals(item.getQuantity(), gotItem.getQuantity());
     }
 
@@ -112,7 +121,12 @@ public class ItemServiceTests extends BaseTest {
         itemService.addNewItem(item);
         itemService.deleteItem(id);
 
-        assertFalse(itemRepository.getAllItems().contains(item));
+        List<Item> removedItems = itemRepository.getAllItems(true);
+
+        boolean isPresent = removedItems.stream()
+                .anyMatch(i -> i.getId() == id && i.getTitle().equals("MacBook Pro"));
+
+        assertTrue(isPresent);
     }
 
 }

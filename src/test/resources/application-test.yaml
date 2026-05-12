@@ -3,3 +3,4 @@ spring:
     url: jdbc:postgresql://localhost:5432/test
     username: test
     password: test
+AZURE_ISSUER_URI: dummy

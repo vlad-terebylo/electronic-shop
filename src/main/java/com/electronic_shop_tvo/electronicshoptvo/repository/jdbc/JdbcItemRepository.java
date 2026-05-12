@@ -28,7 +28,7 @@ public class JdbcItemRepository implements ItemRepository {
         return jdbcTemplate.query(
                 sqlGetAllItems,
                 Map.of(
-                        "is_removed", isRemoved
+                        "isRemoved", isRemoved
                 ),
                 ROW_MAPPER);
     }

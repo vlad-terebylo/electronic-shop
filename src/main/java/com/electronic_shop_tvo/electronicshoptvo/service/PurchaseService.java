@@ -38,6 +38,7 @@ public class PurchaseService {
         for (PurchaseItem purchaseItem : purchase.getPurchaseItems()) {
             int id = purchaseItem.getItemId();
             Item item = itemRepository.getItemById(id, false);
+
             BigDecimal price = item.getPrice();
             int quantity = purchaseItem.getQuantity();
 

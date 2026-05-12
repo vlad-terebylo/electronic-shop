@@ -6,7 +6,10 @@ import com.electronic_shop_tvo.electronicshoptvo.model.PurchaseItem;
 import com.electronic_shop_tvo.electronicshoptvo.repository.PurchaseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -124,7 +127,6 @@ public class JdbcPurchaseRepository implements PurchaseRepository {
         String sqlAddCustomerInfo = """
                 INSERT INTO customer_purchase(email, card_number, total_price)
                 VALUES(:email, :cardNumber, :totalPrice)
-                RETURNING id
                 """;
 
         String sqlAddPurchaseItem = """
@@ -132,11 +134,20 @@ public class JdbcPurchaseRepository implements PurchaseRepository {
                 VALUES(:purchase_id, :item_id, :quantity)
                 """;
 
-        int id = jdbcTemplate.queryForObject(sqlAddCustomerInfo, Map.of(
-                "email", purchase.getEmail(),
-                "cardNumber", purchase.getCardNumber(),
-                "totalPrice", purchase.getTotalPrice()
-        ), Integer.class);
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        MapSqlParameterSource customerParams = new MapSqlParameterSource()
+                .addValue("email", purchase.getEmail())
+                .addValue("cardNumber", purchase.getCardNumber())
+                .addValue("totalPrice", purchase.getTotalPrice());
+
+        jdbcTemplate.update(sqlAddCustomerInfo, customerParams, keyHolder);
+
+        Number generatedId = keyHolder.getKey();
+        if (generatedId == null) {
+            throw new RuntimeException("Failed to retrieve generated ID for purchase");
+        }
+        int id = generatedId.intValue();
 
         List<PurchaseItem> purchaseItems = purchase.getPurchaseItems();
 

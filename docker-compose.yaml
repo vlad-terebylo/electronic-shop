@@ -1,11 +1,10 @@
 version: "3.9"
 
 services:
-  postgresql:
-    image: postgres:latest
+  db:
+    image: mysql:latest
     environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: pokus
-      POSTGRES_DB: electronic_shop_tvo
+      MYSQL_ROOT_PASSWORD: pokus
+      MYSQL_DATABASE: electronic_shop_tvo
     ports:
-      - "5432:5432"
+      - "3306:3306"

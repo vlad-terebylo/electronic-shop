@@ -18,27 +18,36 @@ public class JdbcItemTypeRepository implements ItemTypeRepository {
     private final NamedParameterJdbcOperations jdbcTemplate;
 
     @Override
-    public List<ItemType> getAllItemTypes() {
+    public List<ItemType> getAllItemTypes(boolean isRemoved) {
         String sqlGetAllItemTypes = """
                 SELECT *
-                FROM item_type;
+                FROM item_type
+                WHERE is_removed = :isRemoved;
                 """;
 
-        return jdbcTemplate.query(sqlGetAllItemTypes, ROW_MAPPER);
+        return jdbcTemplate.query(
+                sqlGetAllItemTypes,
+                Map.of(
+                        "isRemoved", isRemoved
+                ),
+                ROW_MAPPER);
     }
 
     @Override
-    public ItemType getItemTypeById(int id) {
+    public ItemType getItemTypeById(int id, boolean isRemoved) {
         String sqlGetItemTypeById = """
                 SELECT *
                 FROM item_type
-                WHERE id = :id
+                WHERE id = :id AND is_removed = :isRemoved
                 """;
 
         try {
             return jdbcTemplate.queryForObject(
                     sqlGetItemTypeById,
-                    Map.of("id", id),
+                    Map.of(
+                            "id", id,
+                            "isRemoved", isRemoved
+                    ),
                     ROW_MAPPER
             );
         } catch (EmptyResultDataAccessException e) {
@@ -58,23 +67,25 @@ public class JdbcItemTypeRepository implements ItemTypeRepository {
     }
 
     @Override
-    public void updateItemType(int id, ItemType itemType) {
+    public void updateItemType(int id, ItemType itemType, boolean isRemoved) {
         String sqlUpdateItem = """
                 UPDATE item_type
                 SET title = :title
-                WHERE id = :id;
+                WHERE id = :id AND is_removed = :isRemoved;
                 """;
 
         jdbcTemplate.update(sqlUpdateItem, Map.of(
                 "id", id,
-                "title", itemType.getTitle()
+                "title", itemType.getTitle(),
+                "isRemoved", isRemoved
         ));
     }
 
     @Override
     public void deleteItemType(int id) {
         String sqlDeleteItem = """
-                DELETE FROM item_type
+                UPDATE item_type
+                SET is_removed = true
                 WHERE id = :id
                 """;
 

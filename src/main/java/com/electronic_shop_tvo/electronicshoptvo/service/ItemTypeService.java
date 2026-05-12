@@ -22,11 +22,11 @@ public class ItemTypeService {
     }
 
     public List<ItemType> getAllItemTypes() {
-        return this.itemTypeRepository.getAllItemTypes();
+        return this.itemTypeRepository.getAllItemTypes(false);
     }
 
     public ItemType getItemTypeById(int id) {
-        return this.itemTypeRepository.getItemTypeById(id);
+        return this.itemTypeRepository.getItemTypeById(id, false);
     }
 
     public void addItemType(ItemType itemType) {
@@ -34,13 +34,13 @@ public class ItemTypeService {
     }
 
     public void updateItemType(int id, ItemType itemType) {
-        ItemType oldItemType = itemTypeRepository.getItemTypeById(id);
+        ItemType oldItemType = itemTypeRepository.getItemTypeById(id, false);
 
         if (isNull(oldItemType)) {
             throw new ItemTypeNotFoundException("Item type is null");
         }
 
-        this.itemTypeRepository.updateItemType(id, itemType);
+        this.itemTypeRepository.updateItemType(id, itemType, false);
     }
 
     public void deleteItemType(int id) {

@@ -7,6 +7,7 @@ import lombok.With;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 
 @Data
@@ -24,5 +25,21 @@ public class Purchase {
         this.email = email;
         this.cardNumber = cardNumber;
         this.purchaseItems = purchaseItems;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Purchase p)) return false;
+        return Objects.equals(id, p.id)
+                && Objects.equals(email, p.email)
+                && Objects.equals(cardNumber, p.cardNumber)
+                && Objects.equals(purchaseItems, p.purchaseItems)
+                && totalPrice.compareTo(p.totalPrice) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(email, cardNumber, totalPrice);
     }
 }
